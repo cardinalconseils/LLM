@@ -1,72 +1,89 @@
 /**
- * ModeToggle - Claude Desktop style toggle for switching council modes
+ * ModeToggle - Apple-style segmented control for switching council modes
  */
 
-import './ModeToggle.css';
+import { MessageSquare, Code, Image } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const modes = [
   {
     id: 'chat',
     label: 'Chat',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-      </svg>
-    ),
-    description: 'General conversation'
+    icon: MessageSquare,
+    description: 'General conversation',
+    color: 'from-[var(--color-primary)] to-blue-600',
   },
   {
     id: 'code',
     label: 'Code',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <polyline points="16 18 22 12 16 6"/>
-        <polyline points="8 6 2 12 8 18"/>
-      </svg>
-    ),
-    description: 'Programming assistance'
+    icon: Code,
+    description: 'Programming assistance',
+    color: 'from-emerald-500 to-emerald-600',
   },
   {
     id: 'image',
     label: 'Image',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-        <circle cx="8.5" cy="8.5" r="1.5"/>
-        <polyline points="21 15 16 10 5 21"/>
-      </svg>
-    ),
-    description: 'Image generation'
-  }
+    icon: Image,
+    description: 'Image generation',
+    color: 'from-violet-500 to-violet-600',
+  },
 ];
 
 export default function ModeToggle({ mode, onModeChange, disabled }) {
+  const activeIndex = modes.findIndex((m) => m.id === mode);
+  const activeMode = modes.find((m) => m.id === mode);
+
   return (
-    <div className="mode-toggle-container">
-      <div className="mode-toggle" role="tablist" aria-label="Council mode">
-        {modes.map((m) => (
-          <button
-            key={m.id}
-            className={`mode-toggle-btn ${mode === m.id ? 'active' : ''}`}
-            onClick={() => onModeChange(m.id)}
-            disabled={disabled}
-            role="tab"
-            aria-selected={mode === m.id}
-            title={m.description}
-          >
-            <span className="mode-icon">{m.icon}</span>
-            <span className="mode-label">{m.label}</span>
-          </button>
-        ))}
+    <div className="flex flex-col items-center p-4 bg-[var(--color-background-secondary)] border-b border-[var(--color-border-light)]">
+      <div
+        className="relative flex bg-white border border-[var(--color-border-light)] rounded-2xl p-1 gap-0.5 shadow-sm"
+        role="tablist"
+        aria-label="Council mode"
+      >
+        {modes.map((m, index) => {
+          const Icon = m.icon;
+          const isActive = mode === m.id;
+
+          return (
+            <button
+              key={m.id}
+              className={cn(
+                'relative z-10 flex items-center justify-center gap-2 px-5 py-2 rounded-xl',
+                'text-sm font-medium transition-colors duration-200',
+                'min-w-[90px] max-sm:min-w-[60px]',
+                isActive
+                  ? 'text-white'
+                  : 'text-[var(--color-foreground-secondary)] hover:text-[var(--color-foreground)]',
+                disabled && 'opacity-50 cursor-not-allowed'
+              )}
+              onClick={() => !disabled && onModeChange(m.id)}
+              disabled={disabled}
+              role="tab"
+              aria-selected={isActive}
+              title={m.description}
+            >
+              <Icon className="w-4 h-4 max-sm:w-4 max-sm:h-4" />
+              <span className="max-sm:hidden">{m.label}</span>
+            </button>
+          );
+        })}
+
+        {/* Animated indicator */}
         <div
-          className="mode-toggle-indicator"
+          className={cn(
+            'absolute top-1 left-1 h-[calc(100%-8px)] rounded-xl',
+            'bg-gradient-to-br shadow-md transition-all duration-200 ease-out',
+            activeMode?.color
+          )}
           style={{
-            transform: `translateX(${modes.findIndex(m => m.id === mode) * 100}%)`
+            width: `calc(${100 / modes.length}% - 4px)`,
+            transform: `translateX(calc(${activeIndex * 100}% + ${activeIndex * 2}px))`,
           }}
         />
       </div>
-      <div className="mode-description">
-        {modes.find(m => m.id === mode)?.description}
+
+      <div className="mt-2 text-xs text-[var(--color-foreground-muted)] uppercase tracking-wider">
+        {activeMode?.description}
       </div>
     </div>
   );

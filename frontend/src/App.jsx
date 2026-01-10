@@ -1,80 +1,78 @@
-import { useState, useEffect, useRef } from 'react';
-import Sidebar from './components/Sidebar';
-import ChatInterface from './components/ChatInterface';
-import { api } from './api';
-import './App.css';
+import { useState, useEffect, useRef } from 'react'
+import { Menu, X } from 'lucide-react'
+import Sidebar from './components/Sidebar'
+import ChatInterface from './components/ChatInterface'
+import { Button } from './components/ui/button'
+import { api } from './api'
+import { cn } from './lib/utils'
 
 function App() {
-  const [conversations, setConversations] = useState([]);
-  const [currentConversationId, setCurrentConversationId] = useState(null);
-  const [currentConversation, setCurrentConversation] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [councilMode, setCouncilMode] = useState('chat'); // 'chat', 'code', or 'image'
-  const [customModels, setCustomModels] = useState(null); // null = use defaults, array = custom selection
-  const [chairmanModel, setChairmanModel] = useState(null); // null = use mode's default
-  const abortControllerRef = useRef(null);
+  const [conversations, setConversations] = useState([])
+  const [currentConversationId, setCurrentConversationId] = useState(null)
+  const [currentConversation, setCurrentConversation] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [councilMode, setCouncilMode] = useState('chat')
+  const [customModels, setCustomModels] = useState(null)
+  const [chairmanModel, setChairmanModel] = useState(null)
+  const abortControllerRef = useRef(null)
 
-  // Load conversations on mount
   useEffect(() => {
-    loadConversations();
-  }, []);
+    loadConversations()
+  }, [])
 
-  // Load conversation details when selected
   useEffect(() => {
     if (currentConversationId) {
-      loadConversation(currentConversationId);
+      loadConversation(currentConversationId)
     }
-  }, [currentConversationId]);
+  }, [currentConversationId])
 
   const loadConversations = async () => {
     try {
-      const convs = await api.listConversations();
-      setConversations(convs);
+      const convs = await api.listConversations()
+      setConversations(convs)
     } catch (error) {
-      console.error('Failed to load conversations:', error);
+      console.error('Failed to load conversations:', error)
     }
-  };
+  }
 
   const loadConversation = async (id) => {
     try {
-      const conv = await api.getConversation(id);
-      setCurrentConversation(conv);
+      const conv = await api.getConversation(id)
+      setCurrentConversation(conv)
     } catch (error) {
-      console.error('Failed to load conversation:', error);
+      console.error('Failed to load conversation:', error)
     }
-  };
+  }
 
   const handleNewConversation = async () => {
     try {
-      const newConv = await api.createConversation();
+      const newConv = await api.createConversation()
       setConversations([
         { id: newConv.id, created_at: newConv.created_at, message_count: 0 },
         ...conversations,
-      ]);
-      setCurrentConversationId(newConv.id);
+      ])
+      setCurrentConversationId(newConv.id)
     } catch (error) {
-      console.error('Failed to create conversation:', error);
+      console.error('Failed to create conversation:', error)
     }
-  };
+  }
 
   const handleSelectConversation = (id) => {
-    setCurrentConversationId(id);
-  };
+    setCurrentConversationId(id)
+  }
 
   const handleSendMessage = async (content) => {
-    if (!currentConversationId) return;
+    if (!currentConversationId) return
 
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      // Optimistically add user message to UI
-      const userMessage = { role: 'user', content };
+      const userMessage = { role: 'user', content }
       setCurrentConversation((prev) => ({
         ...prev,
         messages: [...prev.messages, userMessage],
-      }));
+      }))
 
-      // Create a partial assistant message that will be updated progressively
       const assistantMessage = {
         role: 'assistant',
         stage1: null,
@@ -86,143 +84,141 @@ function App() {
           stage2: false,
           stage3: false,
         },
-      };
+      }
 
-      // Add the partial assistant message
       setCurrentConversation((prev) => ({
         ...prev,
         messages: [...prev.messages, assistantMessage],
-      }));
+      }))
 
-      // Send message with streaming (pass the council mode as options)
-      await api.sendMessageStream(currentConversationId, content, (eventType, event) => {
-        switch (eventType) {
-          case 'stage1_start':
-            setCurrentConversation((prev) => {
-              const messages = [...prev.messages];
-              const lastMsg = messages[messages.length - 1];
-              lastMsg.loading.stage1 = true;
-              return { ...prev, messages };
-            });
-            break;
+      await api.sendMessageStream(
+        currentConversationId,
+        content,
+        (eventType, event) => {
+          switch (eventType) {
+            case 'stage1_start':
+              setCurrentConversation((prev) => {
+                const messages = [...prev.messages]
+                const lastMsg = messages[messages.length - 1]
+                lastMsg.loading.stage1 = true
+                return { ...prev, messages }
+              })
+              break
 
-          case 'stage1_complete':
-            setCurrentConversation((prev) => {
-              const messages = [...prev.messages];
-              const lastMsg = messages[messages.length - 1];
-              lastMsg.stage1 = event.data;
-              lastMsg.loading.stage1 = false;
-              return { ...prev, messages };
-            });
-            break;
+            case 'stage1_complete':
+              setCurrentConversation((prev) => {
+                const messages = [...prev.messages]
+                const lastMsg = messages[messages.length - 1]
+                lastMsg.stage1 = event.data
+                lastMsg.loading.stage1 = false
+                return { ...prev, messages }
+              })
+              break
 
-          case 'stage2_start':
-            setCurrentConversation((prev) => {
-              const messages = [...prev.messages];
-              const lastMsg = messages[messages.length - 1];
-              lastMsg.loading.stage2 = true;
-              return { ...prev, messages };
-            });
-            break;
+            case 'stage2_start':
+              setCurrentConversation((prev) => {
+                const messages = [...prev.messages]
+                const lastMsg = messages[messages.length - 1]
+                lastMsg.loading.stage2 = true
+                return { ...prev, messages }
+              })
+              break
 
-          case 'stage2_complete':
-            setCurrentConversation((prev) => {
-              const messages = [...prev.messages];
-              const lastMsg = messages[messages.length - 1];
-              lastMsg.stage2 = event.data;
-              lastMsg.metadata = event.metadata;
-              lastMsg.loading.stage2 = false;
-              return { ...prev, messages };
-            });
-            break;
+            case 'stage2_complete':
+              setCurrentConversation((prev) => {
+                const messages = [...prev.messages]
+                const lastMsg = messages[messages.length - 1]
+                lastMsg.stage2 = event.data
+                lastMsg.metadata = event.metadata
+                lastMsg.loading.stage2 = false
+                return { ...prev, messages }
+              })
+              break
 
-          case 'stage3_start':
-            setCurrentConversation((prev) => {
-              const messages = [...prev.messages];
-              const lastMsg = messages[messages.length - 1];
-              lastMsg.loading.stage3 = true;
-              return { ...prev, messages };
-            });
-            break;
+            case 'stage3_start':
+              setCurrentConversation((prev) => {
+                const messages = [...prev.messages]
+                const lastMsg = messages[messages.length - 1]
+                lastMsg.loading.stage3 = true
+                return { ...prev, messages }
+              })
+              break
 
-          case 'stage3_complete':
-            setCurrentConversation((prev) => {
-              const messages = [...prev.messages];
-              const lastMsg = messages[messages.length - 1];
-              lastMsg.stage3 = event.data;
-              lastMsg.loading.stage3 = false;
-              return { ...prev, messages };
-            });
-            break;
+            case 'stage3_complete':
+              setCurrentConversation((prev) => {
+                const messages = [...prev.messages]
+                const lastMsg = messages[messages.length - 1]
+                lastMsg.stage3 = event.data
+                lastMsg.loading.stage3 = false
+                return { ...prev, messages }
+              })
+              break
 
-          case 'title_complete':
-            // Reload conversations to get updated title
-            loadConversations();
-            break;
+            case 'title_complete':
+              loadConversations()
+              break
 
-          case 'complete':
-            // Stream complete, reload conversations list
-            loadConversations();
-            setIsLoading(false);
-            break;
+            case 'complete':
+              loadConversations()
+              setIsLoading(false)
+              break
 
-          case 'error':
-            console.error('Stream error:', event.message);
-            setIsLoading(false);
-            break;
+            case 'error':
+              console.error('Stream error:', event.message)
+              setIsLoading(false)
+              break
 
-          default:
-            console.log('Unknown event type:', eventType);
-        }
-      }, { mode: councilMode, customModels, chairmanModel });
+            default:
+              console.log('Unknown event type:', eventType)
+          }
+        },
+        { mode: councilMode, customModels, chairmanModel }
+      )
     } catch (error) {
-      console.error('Failed to send message:', error);
-      // Remove optimistic messages on error
+      console.error('Failed to send message:', error)
       setCurrentConversation((prev) => ({
         ...prev,
         messages: prev.messages.slice(0, -2),
-      }));
-      setIsLoading(false);
+      }))
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleSelectConversationMobile = (id) => {
-    handleSelectConversation(id);
-    setSidebarOpen(false);
-  };
+    handleSelectConversation(id)
+    setSidebarOpen(false)
+  }
 
   const handleStopGeneration = () => {
     if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-      setIsLoading(false);
+      abortControllerRef.current.abort()
+      abortControllerRef.current = null
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
-    <div className="app">
+    <div className="flex h-screen w-screen overflow-hidden bg-[var(--color-background-secondary)]">
       {/* Mobile Menu Toggle */}
-      <button
-        className={`mobile-menu-toggle ${sidebarOpen ? 'open' : ''}`}
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={() => setSidebarOpen(!sidebarOpen)}
         aria-label="Toggle menu"
+        className={cn(
+          'fixed top-4 left-4 z-50 md:hidden',
+          'bg-white/80 backdrop-blur-sm shadow-md hover:bg-white'
+        )}
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          {sidebarOpen ? (
-            <path d="M18 6L6 18M6 6l12 12" />
-          ) : (
-            <>
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </>
-          )}
-        </svg>
-      </button>
+        {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </Button>
 
       {/* Mobile Overlay */}
       <div
-        className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`}
+        className={cn(
+          'fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 md:hidden',
+          sidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        )}
         onClick={() => setSidebarOpen(false)}
       />
 
@@ -234,6 +230,7 @@ function App() {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
+
       <ChatInterface
         conversation={currentConversation}
         onSendMessage={handleSendMessage}
@@ -247,7 +244,7 @@ function App() {
         onChairmanChange={setChairmanModel}
       />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

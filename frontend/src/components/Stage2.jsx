@@ -1,151 +1,186 @@
-import { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import './Stage2.css';
+import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { BarChart3, CheckCircle, ClipboardList, Star } from 'lucide-react'
+import { Card, CardContent } from './ui/card'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs'
+import { Badge } from './ui/badge'
+import { cn } from '@/lib/utils'
 
 function deAnonymizeText(text, labelToModel) {
-  if (!labelToModel) return text;
+  if (!labelToModel) return text
 
-  let result = text;
+  let result = text
   Object.entries(labelToModel).forEach(([label, model]) => {
-    const modelShortName = model.split('/')[1] || model;
-    result = result.replace(new RegExp(label, 'g'), `**${modelShortName}**`);
-  });
-  return result;
+    const modelShortName = model.split('/')[1] || model
+    result = result.replace(new RegExp(label, 'g'), `**${modelShortName}**`)
+  })
+  return result
 }
 
 export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(rankings?.[0]?.model || '')
 
   if (!rankings || rankings.length === 0) {
-    return null;
+    return null
   }
 
   return (
-    <div className="stage stage2 animate-fade-in-up">
-      <div className="stage-header">
-        <div className="stage-badge stage2-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/>
-            <text x="12" y="16" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12" fontWeight="600">2</text>
-          </svg>
+    <Card className="animate-fade-in-up overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center gap-3 p-5 border-b border-[var(--color-border-light)]">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--color-info)]/10 text-[var(--color-info)]">
+          <span className="text-sm font-semibold">2</span>
         </div>
-        <div className="stage-header-text">
-          <h3 className="stage-title">Peer Rankings</h3>
-          <p className="stage-subtitle">Anonymous cross-evaluation</p>
-        </div>
-      </div>
-
-      {/* Aggregate Rankings - Show first as it's the summary */}
-      {aggregateRankings && aggregateRankings.length > 0 && (
-        <div className="aggregate-rankings">
-          <div className="aggregate-header">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M12 20V10"/>
-              <path d="M18 20V4"/>
-              <path d="M6 20v-4"/>
-            </svg>
-            <div>
-              <h4>Aggregate Rankings</h4>
-              <span>Combined peer evaluations (lower is better)</span>
-            </div>
-          </div>
-          <div className="aggregate-list">
-            {aggregateRankings.map((agg, index) => (
-              <div
-                key={index}
-                className={`aggregate-item ${index === 0 ? 'top-ranked' : ''}`}
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <span className={`rank-position rank-${index + 1}`}>
-                  {index === 0 ? (
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                    </svg>
-                  ) : (
-                    `#${index + 1}`
-                  )}
-                </span>
-                <span className="rank-model">
-                  {agg.model.split('/')[1] || agg.model}
-                </span>
-                <div className="rank-stats">
-                  <span className="rank-score">
-                    {agg.average_rank.toFixed(2)}
-                  </span>
-                  <span className="rank-count">
-                    {agg.rankings_count} votes
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Raw Evaluations */}
-      <div className="evaluations-section">
-        <div className="section-header">
-          <h4>Raw Evaluations</h4>
-          <p className="stage-description">
-            Model names shown in <strong>bold</strong> were anonymized during evaluation.
+        <div className="flex-1">
+          <h3 className="text-sm font-semibold text-[var(--color-foreground)]">
+            Peer Rankings
+          </h3>
+          <p className="text-xs text-[var(--color-foreground-tertiary)]">
+            Anonymous cross-evaluation
           </p>
         </div>
-
-        <div className="tabs-container">
-          <div className="tabs">
-            {rankings.map((rank, index) => (
-              <button
-                key={index}
-                className={`tab ${activeTab === index ? 'active' : ''}`}
-                onClick={() => setActiveTab(index)}
-              >
-                <span className="tab-indicator" />
-                <span className="tab-label">{rank.model.split('/')[1] || rank.model}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="tab-content">
-          <div className="model-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M9 12l2 2 4-4"/>
-              <circle cx="12" cy="12" r="10"/>
-            </svg>
-            <span>{rankings[activeTab].model}</span>
-          </div>
-          <div className="ranking-content markdown-content">
-            <ReactMarkdown>
-              {deAnonymizeText(rankings[activeTab].ranking, labelToModel)}
-            </ReactMarkdown>
-          </div>
-
-          {rankings[activeTab].parsed_ranking &&
-           rankings[activeTab].parsed_ranking.length > 0 && (
-            <div className="parsed-ranking">
-              <div className="parsed-header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
-                </svg>
-                <span>Extracted Ranking</span>
-              </div>
-              <ol className="parsed-list">
-                {rankings[activeTab].parsed_ranking.map((label, i) => (
-                  <li key={i}>
-                    <span className="parsed-position">{i + 1}</span>
-                    <span className="parsed-model">
-                      {labelToModel && labelToModel[label]
-                        ? labelToModel[label].split('/')[1] || labelToModel[label]
-                        : label}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
-        </div>
       </div>
-    </div>
-  );
+
+      <CardContent className="p-5 space-y-5">
+        {/* Aggregate Rankings */}
+        {aggregateRankings && aggregateRankings.length > 0 && (
+          <div className="bg-[var(--color-background-secondary)] rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-4">
+              <BarChart3 className="w-4 h-4 text-[var(--color-foreground-tertiary)]" />
+              <div>
+                <h4 className="text-sm font-medium text-[var(--color-foreground)]">
+                  Aggregate Rankings
+                </h4>
+                <span className="text-xs text-[var(--color-foreground-tertiary)]">
+                  Combined peer evaluations (lower is better)
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              {aggregateRankings.map((agg, index) => {
+                const modelName = agg.model.split('/')[1] || agg.model
+                return (
+                  <div
+                    key={agg.model}
+                    className={cn(
+                      'flex items-center gap-3 p-3 rounded-lg transition-colors',
+                      index === 0
+                        ? 'bg-[var(--color-success-bg)] border border-[var(--color-success)]/20'
+                        : 'bg-white border border-[var(--color-border-light)]'
+                    )}
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <div
+                      className={cn(
+                        'flex items-center justify-center w-7 h-7 rounded-full text-xs font-semibold',
+                        index === 0
+                          ? 'bg-[var(--color-success)] text-white'
+                          : 'bg-[var(--color-background-tertiary)] text-[var(--color-foreground-secondary)]'
+                      )}
+                    >
+                      {index === 0 ? (
+                        <Star className="w-3.5 h-3.5 fill-current" />
+                      ) : (
+                        `#${index + 1}`
+                      )}
+                    </div>
+                    <span className="flex-1 text-sm font-medium text-[var(--color-foreground)]">
+                      {modelName}
+                    </span>
+                    <div className="flex items-center gap-3 text-xs">
+                      <span className="font-semibold text-[var(--color-foreground)]">
+                        {agg.average_rank.toFixed(2)}
+                      </span>
+                      <span className="text-[var(--color-foreground-tertiary)]">
+                        {agg.rankings_count} votes
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Raw Evaluations */}
+        <div>
+          <div className="mb-3">
+            <h4 className="text-sm font-medium text-[var(--color-foreground)]">
+              Raw Evaluations
+            </h4>
+            <p className="text-xs text-[var(--color-foreground-tertiary)]">
+              Model names shown in <strong>bold</strong> were anonymized during evaluation.
+            </p>
+          </div>
+
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="w-full flex-wrap h-auto gap-1 p-1">
+              {rankings.map((rank) => {
+                const modelName = rank.model.split('/')[1] || rank.model
+                return (
+                  <TabsTrigger
+                    key={rank.model}
+                    value={rank.model}
+                    className="flex-1 min-w-[100px]"
+                  >
+                    {modelName}
+                  </TabsTrigger>
+                )
+              })}
+            </TabsList>
+
+            {rankings.map((rank) => (
+              <TabsContent key={rank.model} value={rank.model}>
+                <div className="flex items-center gap-2 mb-3">
+                  <CheckCircle className="w-4 h-4 text-[var(--color-foreground-tertiary)]" />
+                  <Badge variant="secondary">{rank.model}</Badge>
+                </div>
+
+                <div className="bg-[var(--color-background-secondary)] rounded-xl">
+                  <div className="markdown-content">
+                    <ReactMarkdown>
+                      {deAnonymizeText(rank.ranking, labelToModel)}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+
+                {/* Extracted Ranking */}
+                {rank.parsed_ranking && rank.parsed_ranking.length > 0 && (
+                  <div className="mt-4 p-4 bg-[var(--color-info-bg)] rounded-xl border border-[var(--color-info)]/20">
+                    <div className="flex items-center gap-2 mb-3">
+                      <ClipboardList className="w-4 h-4 text-[var(--color-info)]" />
+                      <span className="text-sm font-medium text-[var(--color-foreground)]">
+                        Extracted Ranking
+                      </span>
+                    </div>
+                    <ol className="space-y-1.5">
+                      {rank.parsed_ranking.map((label, i) => {
+                        const modelName = labelToModel && labelToModel[label]
+                          ? labelToModel[label].split('/')[1] || labelToModel[label]
+                          : label
+                        return (
+                          <li
+                            key={i}
+                            className="flex items-center gap-2 text-sm"
+                          >
+                            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[var(--color-info)]/20 text-[var(--color-info)] text-xs font-medium">
+                              {i + 1}
+                            </span>
+                            <span className="text-[var(--color-foreground)]">
+                              {modelName}
+                            </span>
+                          </li>
+                        )
+                      })}
+                    </ol>
+                  </div>
+                )}
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
+      </CardContent>
+    </Card>
+  )
 }

@@ -1,12 +1,23 @@
-import { useState, useEffect, useRef } from 'react';
-import ReactMarkdown from 'react-markdown';
-import Stage1 from './Stage1';
-import Stage2 from './Stage2';
-import Stage3 from './Stage3';
-import ModelSelector from './ModelSelector';
-import './ChatInterface.css';
+import { useState, useEffect, useRef } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { MessageSquare, Code, Image, Settings, Paperclip, Send, Square, User, Sparkles, X } from 'lucide-react'
+import Stage1 from './Stage1'
+import Stage2 from './Stage2'
+import Stage3 from './Stage3'
+import ModelSelector from './ModelSelector'
+import { Button } from './ui/button'
+import { Card } from './ui/card'
+import { Badge } from './ui/badge'
+import { Textarea } from './ui/textarea'
+import { cn } from '@/lib/utils'
 
-const MAX_CHARS = 10000;
+const MAX_CHARS = 10000
+
+const modes = {
+  chat: { icon: MessageSquare, name: 'Chat', description: 'General conversation with multiple AI models' },
+  code: { icon: Code, name: 'Code', description: 'Programming help from expert models' },
+  image: { icon: Image, name: 'Image', description: 'Creative image generation council' },
+}
 
 export default function ChatInterface({
   conversation,
@@ -20,207 +31,158 @@ export default function ChatInterface({
   chairmanModel,
   onChairmanChange,
 }) {
-  const [input, setInput] = useState('');
-  const [attachments, setAttachments] = useState([]);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [showModelSelector, setShowModelSelector] = useState(false);
-  const fileInputRef = useRef(null);
-  const textareaRef = useRef(null);
-  const messagesEndRef = useRef(null);
+  const [input, setInput] = useState('')
+  const [attachments, setAttachments] = useState([])
+  const [isDragOver, setIsDragOver] = useState(false)
+  const [showModelSelector, setShowModelSelector] = useState(false)
+  const fileInputRef = useRef(null)
+  const textareaRef = useRef(null)
+  const messagesEndRef = useRef(null)
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   useEffect(() => {
-    scrollToBottom();
-  }, [conversation]);
+    scrollToBottom()
+  }, [conversation])
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     if (input.trim() && !isLoading) {
-      onSendMessage(input);
-      setInput('');
+      onSendMessage(input)
+      setInput('')
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto'
+      }
     }
-  };
+  }
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit(e);
+      e.preventDefault()
+      handleSubmit(e)
     }
-  };
+  }
 
-  // Auto-resize textarea
   const handleInputChange = (e) => {
-    const value = e.target.value;
+    const value = e.target.value
     if (value.length <= MAX_CHARS) {
-      setInput(value);
+      setInput(value)
     }
-    // Auto-resize
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 200) + 'px';
+      textareaRef.current.style.height = 'auto'
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 200) + 'px'
     }
-  };
+  }
 
-  // File handling
   const handleFileSelect = (e) => {
-    const files = Array.from(e.target.files);
-    addFiles(files);
-  };
+    const files = Array.from(e.target.files)
+    addFiles(files)
+  }
 
   const addFiles = (files) => {
-    const validFiles = files.filter(file => {
-      const isValid = file.size <= 10 * 1024 * 1024; // 10MB limit
-      if (!isValid) {
-        console.warn(`File ${file.name} exceeds 10MB limit`);
-      }
-      return isValid;
-    });
-
-    setAttachments(prev => [...prev, ...validFiles].slice(0, 5)); // Max 5 files
-  };
+    const validFiles = files.filter((file) => {
+      const isValid = file.size <= 10 * 1024 * 1024
+      return isValid
+    })
+    setAttachments((prev) => [...prev, ...validFiles].slice(0, 5))
+  }
 
   const removeAttachment = (index) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
-  };
+    setAttachments((prev) => prev.filter((_, i) => i !== index))
+  }
 
-  // Drag and drop
   const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
+    e.preventDefault()
+    setIsDragOver(true)
+  }
 
   const handleDragLeave = (e) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
+    e.preventDefault()
+    setIsDragOver(false)
+  }
 
   const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    const files = Array.from(e.dataTransfer.files);
-    addFiles(files);
-  };
-
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-
-  const getFileIcon = (file) => {
-    const type = file.type;
-    if (type.startsWith('image/')) return '🖼️';
-    if (type.startsWith('text/') || type.includes('json')) return '📄';
-    if (type.includes('pdf')) return '📕';
-    if (type.includes('zip') || type.includes('tar')) return '📦';
-    return '📎';
-  };
+    e.preventDefault()
+    setIsDragOver(false)
+    const files = Array.from(e.dataTransfer.files)
+    addFiles(files)
+  }
 
   const formatFileSize = (bytes) => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-  };
+    if (bytes < 1024) return bytes + ' B'
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  }
 
-  const getModeIcon = (modeKey) => {
-    switch (modeKey) {
-      case 'chat':
-        return (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-        );
-      case 'code':
-        return (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <polyline points="16 18 22 12 16 6"/>
-            <polyline points="8 6 2 12 8 18"/>
-          </svg>
-        );
-      case 'image':
-        return (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <polyline points="21 15 16 10 5 21"/>
-          </svg>
-        );
-      default:
-        return null;
-    }
-  };
+  const ModeIcon = modes[mode]?.icon || MessageSquare
 
-  const getModeInfo = (modeKey) => {
-    const modes = {
-      chat: { name: 'Chat', description: 'General conversation with multiple AI models' },
-      code: { name: 'Code', description: 'Programming help from expert models' },
-      image: { name: 'Image', description: 'Creative image generation council' },
-    };
-    return modes[modeKey] || { name: modeKey, description: '' };
-  };
-
+  // Empty state - no conversation selected
   if (!conversation) {
     return (
-      <main className="chat-interface">
-        <div className="empty-state">
-          <div className="empty-icon-large">
-            <svg viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.9"/>
-              <circle cx="12" cy="5" r="2" fill="currentColor" opacity="0.7"/>
-              <circle cx="17.5" cy="8" r="2" fill="currentColor" opacity="0.7"/>
-              <circle cx="17.5" cy="16" r="2" fill="currentColor" opacity="0.7"/>
-              <circle cx="12" cy="19" r="2" fill="currentColor" opacity="0.7"/>
-              <circle cx="6.5" cy="16" r="2" fill="currentColor" opacity="0.7"/>
-              <circle cx="6.5" cy="8" r="2" fill="currentColor" opacity="0.7"/>
-            </svg>
+      <main className="flex-1 flex flex-col items-center justify-center p-8 bg-[var(--color-background-secondary)]">
+        <div className="w-full max-w-2xl text-center">
+          {/* Logo */}
+          <div className="flex items-center justify-center w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-[var(--color-primary)] to-blue-600 text-white mb-6 shadow-lg">
+            <Sparkles className="w-10 h-10" />
           </div>
-          <h2>Welcome to LLM Council</h2>
-          <p>Harness the collective intelligence of multiple AI models</p>
+
+          <h2 className="text-2xl font-semibold text-[var(--color-foreground)] mb-2">
+            Welcome to LLM Council
+          </h2>
+          <p className="text-[var(--color-foreground-secondary)] mb-8">
+            Harness the collective intelligence of multiple AI models
+          </p>
 
           {/* Mode Selector */}
-          <div className="empty-features mode-selector-grid">
-            {['chat', 'code', 'image'].map((modeKey) => {
-              const info = getModeInfo(modeKey);
-              return (
-                <button
-                  key={modeKey}
-                  className={`feature mode-feature ${mode === modeKey ? 'active' : ''}`}
-                  onClick={() => onModeChange(modeKey)}
-                >
-                  <div className={`feature-icon ${mode === modeKey ? 'active' : ''}`}>
-                    {getModeIcon(modeKey)}
-                  </div>
-                  <div className="feature-text">
-                    <span className="feature-name">{info.name}</span>
-                    <span className="feature-description">{info.description}</span>
-                  </div>
-                  {mode === modeKey && (
-                    <div className="active-indicator">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="20 6 9 17 4 12"/>
-                      </svg>
-                    </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            {Object.entries(modes).map(([key, { icon: Icon, name, description }]) => (
+              <button
+                key={key}
+                onClick={() => onModeChange(key)}
+                className={cn(
+                  'relative flex flex-col items-start gap-3 p-5 rounded-2xl text-left transition-all duration-200',
+                  'border-2 bg-white hover:shadow-md',
+                  mode === key
+                    ? 'border-[var(--color-primary)] shadow-md'
+                    : 'border-transparent hover:border-[var(--color-border)]'
+                )}
+              >
+                <div
+                  className={cn(
+                    'flex items-center justify-center w-10 h-10 rounded-xl transition-colors',
+                    mode === key
+                      ? 'bg-[var(--color-primary)] text-white'
+                      : 'bg-[var(--color-background-secondary)] text-[var(--color-foreground-secondary)]'
                   )}
-                </button>
-              );
-            })}
+                >
+                  <Icon className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="font-medium text-[var(--color-foreground)]">{name}</div>
+                  <div className="text-xs text-[var(--color-foreground-tertiary)] mt-1">
+                    {description}
+                  </div>
+                </div>
+                {mode === key && (
+                  <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-[var(--color-primary)]" />
+                )}
+              </button>
+            ))}
           </div>
 
           {/* Settings Button */}
-          <button
-            className="config-button"
+          <Button
+            variant="outline"
             onClick={() => setShowModelSelector(true)}
+            className="gap-2"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <circle cx="12" cy="12" r="3"/>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-            </svg>
+            <Settings className="w-4 h-4" />
             Configure Council Models
-          </button>
+          </Button>
         </div>
 
-        {/* Model Selector Modal */}
         <ModelSelector
           isOpen={showModelSelector}
           onClose={() => setShowModelSelector(false)}
@@ -232,267 +194,233 @@ export default function ChatInterface({
           onChairmanChange={onChairmanChange}
         />
       </main>
-    );
+    )
   }
 
   return (
-    <main className="chat-interface">
-      <div className="messages-container">
-        {conversation.messages.length === 0 ? (
-          <div className="empty-state compact">
-            <div className="empty-icon-medium">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
+    <main className="flex-1 flex flex-col h-full bg-[var(--color-background-secondary)] overflow-hidden">
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-4xl mx-auto p-6">
+          {conversation.messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-[var(--color-background-tertiary)] text-[var(--color-foreground-tertiary)] mb-4">
+                <MessageSquare className="w-8 h-8" />
+              </div>
+              <h2 className="text-xl font-semibold text-[var(--color-foreground)] mb-2">
+                Start a conversation
+              </h2>
+              <p className="text-[var(--color-foreground-secondary)]">
+                Ask a question to consult the LLM Council
+              </p>
             </div>
-            <h2>Start a conversation</h2>
-            <p>Ask a question to consult the LLM Council</p>
-          </div>
-        ) : (
-          conversation.messages.map((msg, index) => (
-            <div key={index} className="message-group animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
-              {msg.role === 'user' ? (
-                <div className="user-message">
-                  <div className="message-avatar user-avatar">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                  </div>
-                  <div className="message-wrapper">
-                    <div className="message-label">You</div>
-                    <div className="message-content user-bubble">
-                      <div className="markdown-content">
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+          ) : (
+            <div className="flex flex-col gap-6">
+              {conversation.messages.map((msg, index) => (
+                <div
+                  key={index}
+                  className="animate-fade-in-up"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  {msg.role === 'user' ? (
+                    <div className="flex gap-4">
+                      <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--color-foreground)] text-white shrink-0">
+                        <User className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-medium text-[var(--color-foreground-secondary)] mb-1">
+                          You
+                        </div>
+                        <Card className="inline-block max-w-full">
+                          <div className="markdown-content">
+                            <ReactMarkdown>{msg.content}</ReactMarkdown>
+                          </div>
+                        </Card>
                       </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="flex gap-4">
+                      <div className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-blue-600 text-white shrink-0">
+                        <Sparkles className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0 space-y-4">
+                        <div className="text-xs font-medium text-[var(--color-foreground-secondary)]">
+                          LLM Council
+                        </div>
+
+                        {/* Stage 1 */}
+                        {msg.loading?.stage1 && (
+                          <LoadingState stage={1} text="Collecting individual responses..." />
+                        )}
+                        {msg.stage1 && <Stage1 responses={msg.stage1} />}
+
+                        {/* Stage 2 */}
+                        {msg.loading?.stage2 && (
+                          <LoadingState stage={2} text="Running peer rankings..." />
+                        )}
+                        {msg.stage2 && (
+                          <Stage2
+                            rankings={msg.stage2}
+                            labelToModel={msg.metadata?.label_to_model}
+                            aggregateRankings={msg.metadata?.aggregate_rankings}
+                          />
+                        )}
+
+                        {/* Stage 3 */}
+                        {msg.loading?.stage3 && (
+                          <LoadingState stage={3} text="Synthesizing final answer..." variant="success" />
+                        )}
+                        {msg.stage3 && <Stage3 finalResponse={msg.stage3} />}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="assistant-message">
-                  <div className="message-avatar assistant-avatar">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.9"/>
-                      <circle cx="12" cy="6" r="1.5" fill="currentColor" opacity="0.6"/>
-                      <circle cx="16" cy="9" r="1.5" fill="currentColor" opacity="0.6"/>
-                      <circle cx="16" cy="15" r="1.5" fill="currentColor" opacity="0.6"/>
-                      <circle cx="12" cy="18" r="1.5" fill="currentColor" opacity="0.6"/>
-                      <circle cx="8" cy="15" r="1.5" fill="currentColor" opacity="0.6"/>
-                      <circle cx="8" cy="9" r="1.5" fill="currentColor" opacity="0.6"/>
-                    </svg>
-                  </div>
-                  <div className="message-wrapper full-width">
-                    <div className="message-label">LLM Council</div>
-
-                    {/* Stage 1 */}
-                    {msg.loading?.stage1 && (
-                      <div className="stage-loading">
-                        <div className="loading-pulse">
-                          <span></span>
-                          <span></span>
-                          <span></span>
-                        </div>
-                        <div className="loading-text">
-                          <strong>Stage 1</strong>
-                          <span>Collecting individual responses...</span>
-                        </div>
-                      </div>
-                    )}
-                    {msg.stage1 && <Stage1 responses={msg.stage1} />}
-
-                    {/* Stage 2 */}
-                    {msg.loading?.stage2 && (
-                      <div className="stage-loading">
-                        <div className="loading-pulse">
-                          <span></span>
-                          <span></span>
-                          <span></span>
-                        </div>
-                        <div className="loading-text">
-                          <strong>Stage 2</strong>
-                          <span>Running peer rankings...</span>
-                        </div>
-                      </div>
-                    )}
-                    {msg.stage2 && (
-                      <Stage2
-                        rankings={msg.stage2}
-                        labelToModel={msg.metadata?.label_to_model}
-                        aggregateRankings={msg.metadata?.aggregate_rankings}
-                      />
-                    )}
-
-                    {/* Stage 3 */}
-                    {msg.loading?.stage3 && (
-                      <div className="stage-loading success">
-                        <div className="loading-pulse">
-                          <span></span>
-                          <span></span>
-                          <span></span>
-                        </div>
-                        <div className="loading-text">
-                          <strong>Stage 3</strong>
-                          <span>Synthesizing final answer...</span>
-                        </div>
-                      </div>
-                    )}
-                    {msg.stage3 && <Stage3 finalResponse={msg.stage3} />}
-                  </div>
-                </div>
-              )}
+              ))}
             </div>
-          ))
-        )}
-
-        <div ref={messagesEndRef} />
+          )}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
-      {/* Input Form - Always visible */}
-      <form
-        className={`input-form ${isDragOver ? 'drag-over' : ''}`}
-        onSubmit={handleSubmit}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
-        {/* Drag overlay */}
-        {isDragOver && (
-          <div className="drag-overlay">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            <span>Drop files here</span>
-          </div>
-        )}
+      {/* Input Area */}
+      <div className="border-t border-[var(--color-border-light)] bg-white p-4">
+        <form
+          onSubmit={handleSubmit}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className="max-w-4xl mx-auto"
+        >
+          {/* Drag Overlay */}
+          {isDragOver && (
+            <div className="absolute inset-0 flex items-center justify-center bg-[var(--color-primary)]/5 border-2 border-dashed border-[var(--color-primary)] rounded-2xl z-10">
+              <div className="text-[var(--color-primary)] font-medium">Drop files here</div>
+            </div>
+          )}
 
-        {/* File attachments preview */}
-        {attachments.length > 0 && (
-          <div className="attachments-preview">
-            {attachments.map((file, index) => (
-              <div key={index} className="attachment-chip">
-                <span className="attachment-icon">{getFileIcon(file)}</span>
-                <span className="attachment-name">{file.name}</span>
-                <span className="attachment-size">{formatFileSize(file.size)}</span>
-                <button
-                  type="button"
-                  className="attachment-remove"
-                  onClick={() => removeAttachment(index)}
-                  aria-label="Remove file"
+          {/* File Attachments */}
+          {attachments.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {attachments.map((file, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-[var(--color-background-secondary)] rounded-lg text-sm"
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+                  <Paperclip className="w-3 h-3 text-[var(--color-foreground-tertiary)]" />
+                  <span className="text-[var(--color-foreground)]">{file.name}</span>
+                  <span className="text-[var(--color-foreground-tertiary)]">
+                    {formatFileSize(file.size)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeAttachment(index)}
+                    className="p-0.5 hover:bg-[var(--color-background-tertiary)] rounded"
+                  >
+                    <X className="w-3 h-3 text-[var(--color-foreground-tertiary)]" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
-        <div className="input-container">
-          {/* Input toolbar */}
-          <div className="input-toolbar">
-            {/* Mode Badge */}
-            <div className={`mode-badge ${mode}`}>
-              {getModeIcon(mode)}
-              <span>{mode}</span>
+          {/* Input Container */}
+          <div className="flex items-end gap-3">
+            {/* Toolbar */}
+            <div className="flex items-center gap-1">
+              <Badge variant="secondary" className="gap-1.5 px-2.5 py-1">
+                <ModeIcon className="w-3 h-3" />
+                <span className="capitalize">{mode}</span>
+              </Badge>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="iconSm"
+                onClick={() => setShowModelSelector(true)}
+                title="Configure council models"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+                accept=".txt,.md,.json,.csv,.pdf,.png,.jpg,.jpeg,.gif,.webp"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="iconSm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isLoading || attachments.length >= 5}
+                title="Attach files"
+              >
+                <Paperclip className="w-4 h-4" />
+              </Button>
             </div>
 
-            {/* Settings Button */}
-            <button
-              type="button"
-              className="toolbar-button"
-              onClick={() => setShowModelSelector(true)}
-              title="Configure council models"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-              </svg>
-            </button>
+            {/* Textarea */}
+            <div className="flex-1">
+              <Textarea
+                ref={textareaRef}
+                placeholder={
+                  conversation.messages.length === 0
+                    ? 'Ask your question to consult the LLM Council...'
+                    : 'Continue the conversation...'
+                }
+                value={input}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                disabled={isLoading}
+                rows={1}
+                className="min-h-[44px] max-h-[200px] py-2.5"
+              />
+            </div>
 
-            {/* File Attachment */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              onChange={handleFileSelect}
-              className="file-input-hidden"
-              accept=".txt,.md,.json,.csv,.pdf,.png,.jpg,.jpeg,.gif,.webp"
-            />
-            <button
-              type="button"
-              className="toolbar-button"
-              onClick={triggerFileInput}
-              title="Attach files (max 10MB each)"
-              disabled={isLoading || attachments.length >= 5}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Main input area */}
-          <div className="input-wrapper">
-            <textarea
-              ref={textareaRef}
-              className="message-input"
-              placeholder={conversation.messages.length === 0
-                ? "Ask your question to consult the LLM Council..."
-                : "Continue the conversation..."}
-              value={input}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              disabled={isLoading}
-              rows={1}
-            />
-          </div>
-
-          {/* Action buttons */}
-          <div className="input-actions">
+            {/* Send/Stop Button */}
             {isLoading ? (
-              <button
+              <Button
                 type="button"
-                className="stop-button"
+                variant="destructive"
                 onClick={onStopGeneration}
-                title="Stop generation"
+                className="gap-2"
               >
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="6" y="6" width="12" height="12" rx="2" />
-                </svg>
-                <span>Stop</span>
-              </button>
+                <Square className="w-4 h-4 fill-current" />
+                Stop
+              </Button>
             ) : (
-              <button
-                type="submit"
-                className="send-button"
-                disabled={!input.trim() || isLoading}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="22" y1="2" x2="11" y2="13"/>
-                  <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                </svg>
-                <span>Send</span>
-              </button>
+              <Button type="submit" disabled={!input.trim()}>
+                <Send className="w-4 h-4" />
+              </Button>
             )}
           </div>
-        </div>
 
-        {/* Footer with hints and counter */}
-        <div className="input-footer">
-          <div className="input-hint">
-            <kbd>Enter</kbd> to send, <kbd>Shift + Enter</kbd> for new line
+          {/* Footer Hints */}
+          <div className="flex items-center justify-between mt-2 text-xs text-[var(--color-foreground-tertiary)]">
+            <div className="flex items-center gap-3">
+              <span>
+                <kbd className="px-1.5 py-0.5 bg-[var(--color-background-secondary)] rounded text-[10px]">
+                  Enter
+                </kbd>{' '}
+                to send
+              </span>
+              <span>
+                <kbd className="px-1.5 py-0.5 bg-[var(--color-background-secondary)] rounded text-[10px]">
+                  Shift+Enter
+                </kbd>{' '}
+                for new line
+              </span>
+            </div>
+            <div className={cn(input.length > MAX_CHARS * 0.9 && 'text-[var(--color-warning)]')}>
+              {input.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
+            </div>
           </div>
-          <div className={`char-counter ${input.length > MAX_CHARS * 0.9 ? 'warning' : ''}`}>
-            {input.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
-          </div>
-        </div>
-      </form>
+        </form>
+      </div>
 
-      {/* Model Selector Modal */}
       <ModelSelector
         isOpen={showModelSelector}
         onClose={() => setShowModelSelector(false)}
@@ -504,5 +432,34 @@ export default function ChatInterface({
         onChairmanChange={onChairmanChange}
       />
     </main>
-  );
+  )
+}
+
+function LoadingState({ stage, text, variant = 'default' }) {
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-3 p-4 rounded-2xl',
+        variant === 'success'
+          ? 'bg-[var(--color-success-bg)]'
+          : 'bg-[var(--color-background-secondary)]'
+      )}
+    >
+      <div className="flex gap-1">
+        <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
+        <span
+          className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse"
+          style={{ animationDelay: '150ms' }}
+        />
+        <span
+          className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse"
+          style={{ animationDelay: '300ms' }}
+        />
+      </div>
+      <div>
+        <span className="font-medium text-[var(--color-foreground)]">Stage {stage}</span>
+        <span className="text-[var(--color-foreground-secondary)] ml-2">{text}</span>
+      </div>
+    </div>
+  )
 }

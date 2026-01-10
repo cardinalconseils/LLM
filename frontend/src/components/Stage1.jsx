@@ -1,57 +1,70 @@
-import { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import './Stage1.css';
+import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { Layers } from 'lucide-react'
+import { Card, CardContent } from './ui/card'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs'
+import { Badge } from './ui/badge'
+import { cn } from '@/lib/utils'
 
 export default function Stage1({ responses }) {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(responses?.[0]?.model || '')
 
   if (!responses || responses.length === 0) {
-    return null;
+    return null
   }
 
   return (
-    <div className="stage stage1 animate-fade-in-up">
-      <div className="stage-header">
-        <div className="stage-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/>
-            <text x="12" y="16" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12" fontWeight="600">1</text>
-          </svg>
+    <Card className="animate-fade-in-up overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center gap-3 p-5 border-b border-[var(--color-border-light)]">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+          <span className="text-sm font-semibold">1</span>
         </div>
-        <div className="stage-header-text">
-          <h3 className="stage-title">Individual Responses</h3>
-          <p className="stage-subtitle">{responses.length} models responded</p>
-        </div>
-      </div>
-
-      <div className="tabs-container">
-        <div className="tabs">
-          {responses.map((resp, index) => (
-            <button
-              key={index}
-              className={`tab ${activeTab === index ? 'active' : ''}`}
-              onClick={() => setActiveTab(index)}
-            >
-              <span className="tab-indicator" />
-              <span className="tab-label">{resp.model.split('/')[1] || resp.model}</span>
-            </button>
-          ))}
+        <div className="flex-1">
+          <h3 className="text-sm font-semibold text-[var(--color-foreground)]">
+            Individual Responses
+          </h3>
+          <p className="text-xs text-[var(--color-foreground-tertiary)]">
+            {responses.length} models responded
+          </p>
         </div>
       </div>
 
-      <div className="tab-content">
-        <div className="model-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-            <path d="M2 17l10 5 10-5"/>
-            <path d="M2 12l10 5 10-5"/>
-          </svg>
-          <span>{responses[activeTab].model}</span>
-        </div>
-        <div className="response-content markdown-content">
-          <ReactMarkdown>{responses[activeTab].response}</ReactMarkdown>
-        </div>
-      </div>
-    </div>
-  );
+      <CardContent className="p-5">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="w-full flex-wrap h-auto gap-1 p-1">
+            {responses.map((resp) => {
+              const modelName = resp.model.split('/')[1] || resp.model
+              return (
+                <TabsTrigger
+                  key={resp.model}
+                  value={resp.model}
+                  className="flex-1 min-w-[100px]"
+                >
+                  {modelName}
+                </TabsTrigger>
+              )
+            })}
+          </TabsList>
+
+          {responses.map((resp) => {
+            const modelName = resp.model.split('/')[1] || resp.model
+            return (
+              <TabsContent key={resp.model} value={resp.model}>
+                <div className="flex items-center gap-2 mb-3">
+                  <Layers className="w-4 h-4 text-[var(--color-foreground-tertiary)]" />
+                  <Badge variant="secondary">{resp.model}</Badge>
+                </div>
+                <div className="bg-[var(--color-background-secondary)] rounded-xl">
+                  <div className="markdown-content">
+                    <ReactMarkdown>{resp.response}</ReactMarkdown>
+                  </div>
+                </div>
+              </TabsContent>
+            )
+          })}
+        </Tabs>
+      </CardContent>
+    </Card>
+  )
 }

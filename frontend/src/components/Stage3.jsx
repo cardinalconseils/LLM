@@ -1,53 +1,59 @@
-import ReactMarkdown from 'react-markdown';
-import './Stage3.css';
+import ReactMarkdown from 'react-markdown'
+import { CheckCircle2, GraduationCap } from 'lucide-react'
+import { Card, CardContent } from './ui/card'
+import { Badge } from './ui/badge'
 
 export default function Stage3({ finalResponse }) {
   if (!finalResponse) {
-    return null;
+    return null
   }
 
+  const modelName = finalResponse.model.split('/')[1] || finalResponse.model
+
   return (
-    <div className="stage stage3 animate-fade-in-up">
-      <div className="stage-header">
-        <div className="stage-badge stage3-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/>
-            <text x="12" y="16" textAnchor="middle" fill="currentColor" stroke="none" fontSize="12" fontWeight="600">3</text>
-          </svg>
+    <Card className="animate-fade-in-up overflow-hidden border-[var(--color-success)]/20 bg-gradient-to-br from-white to-[var(--color-success-bg)]">
+      {/* Header */}
+      <div className="flex items-center gap-3 p-5 border-b border-[var(--color-success)]/20">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--color-success)]/10 text-[var(--color-success)]">
+          <span className="text-sm font-semibold">3</span>
         </div>
-        <div className="stage-header-text">
-          <h3 className="stage-title">Final Council Answer</h3>
-          <p className="stage-subtitle">Synthesized response</p>
+        <div className="flex-1">
+          <h3 className="text-sm font-semibold text-[var(--color-foreground)]">
+            Final Council Answer
+          </h3>
+          <p className="text-xs text-[var(--color-foreground-tertiary)]">
+            Synthesized response
+          </p>
         </div>
-        <div className="council-verdict">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
-          <span>Consensus Reached</span>
-        </div>
+        <Badge variant="success" className="gap-1.5">
+          <CheckCircle2 className="w-3 h-3" />
+          Consensus Reached
+        </Badge>
       </div>
 
-      <div className="final-response">
-        <div className="chairman-info">
-          <div className="chairman-avatar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M12 14l9-5-9-5-9 5 9 5z"/>
-              <path d="M12 14l6.16-3.422a12.083 12.083 0 0 1 .665 6.479A11.952 11.952 0 0 0 12 20.055a11.952 11.952 0 0 0-6.824-2.998 12.078 12.078 0 0 1 .665-6.479L12 14z"/>
-              <path d="M12 14l9-5-9-5-9 5 9 5z"/>
-              <path d="M12 14v7"/>
-            </svg>
+      <CardContent className="p-5">
+        {/* Chairman Info */}
+        <div className="flex items-center gap-3 mb-4 p-3 bg-white rounded-xl border border-[var(--color-border-light)]">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--color-primary)] to-blue-600 text-white">
+            <GraduationCap className="w-5 h-5" />
           </div>
-          <div className="chairman-details">
-            <span className="chairman-role">Chairman Model</span>
-            <span className="chairman-model">{finalResponse.model.split('/')[1] || finalResponse.model}</span>
+          <div>
+            <span className="block text-xs text-[var(--color-foreground-tertiary)]">
+              Chairman Model
+            </span>
+            <span className="text-sm font-medium text-[var(--color-foreground)]">
+              {modelName}
+            </span>
           </div>
         </div>
 
-        <div className="final-content markdown-content">
-          <ReactMarkdown>{finalResponse.response}</ReactMarkdown>
+        {/* Response Content */}
+        <div className="bg-white rounded-xl border border-[var(--color-border-light)]">
+          <div className="markdown-content">
+            <ReactMarkdown>{finalResponse.response}</ReactMarkdown>
+          </div>
         </div>
-      </div>
-    </div>
-  );
+      </CardContent>
+    </Card>
+  )
 }
