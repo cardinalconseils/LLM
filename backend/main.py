@@ -11,19 +11,36 @@ import json
 import asyncio
 import httpx
 
-from . import storage
-from .council import run_full_council, generate_conversation_title, stage1_collect_responses, stage2_collect_rankings, stage3_synthesize_final, calculate_aggregate_rankings
-from .config import (
-    OPENROUTER_API_KEY,
-    get_council_models,
-    get_chairman_model,
-    CHAT_COUNCIL_MODELS,
-    CODE_COUNCIL_MODELS,
-    IMAGE_COUNCIL_MODELS,
-    CHAT_CHAIRMAN_MODEL,
-    CODE_CHAIRMAN_MODEL,
-    IMAGE_CHAIRMAN_MODEL,
-)
+try:
+    # Package imports (when run as python -m backend.main)
+    from . import storage
+    from .council import run_full_council, generate_conversation_title, stage1_collect_responses, stage2_collect_rankings, stage3_synthesize_final, calculate_aggregate_rankings
+    from .config import (
+        OPENROUTER_API_KEY,
+        get_council_models,
+        get_chairman_model,
+        CHAT_COUNCIL_MODELS,
+        CODE_COUNCIL_MODELS,
+        IMAGE_COUNCIL_MODELS,
+        CHAT_CHAIRMAN_MODEL,
+        CODE_CHAIRMAN_MODEL,
+        IMAGE_CHAIRMAN_MODEL,
+    )
+except ImportError:
+    # Standalone imports (when run from /app on Railway)
+    import storage
+    from council import run_full_council, generate_conversation_title, stage1_collect_responses, stage2_collect_rankings, stage3_synthesize_final, calculate_aggregate_rankings
+    from config import (
+        OPENROUTER_API_KEY,
+        get_council_models,
+        get_chairman_model,
+        CHAT_COUNCIL_MODELS,
+        CODE_COUNCIL_MODELS,
+        IMAGE_COUNCIL_MODELS,
+        CHAT_CHAIRMAN_MODEL,
+        CODE_CHAIRMAN_MODEL,
+        IMAGE_CHAIRMAN_MODEL,
+    )
 
 app = FastAPI(title="LLM Council API", version="0.2.0")
 

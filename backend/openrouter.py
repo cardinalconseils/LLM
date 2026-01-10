@@ -2,7 +2,10 @@
 
 import httpx
 from typing import List, Dict, Any, Optional
-from .config import OPENROUTER_API_KEY, OPENROUTER_API_URL, IMAGE_GENERATION_CONFIG
+try:
+    from .config import OPENROUTER_API_KEY, OPENROUTER_API_URL, IMAGE_GENERATION_CONFIG
+except ImportError:
+    from config import OPENROUTER_API_KEY, OPENROUTER_API_URL, IMAGE_GENERATION_CONFIG
 
 
 async def query_model(

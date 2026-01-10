@@ -1,12 +1,20 @@
 """3-stage LLM Council orchestration with multi-mode support."""
 
 from typing import List, Dict, Any, Tuple, Optional
-from .openrouter import query_models_parallel, query_model
-from .config import (
-    COUNCIL_MODELS, CHAIRMAN_MODEL,
-    get_council_models, get_chairman_model
-)
-from .web_search import get_search_context
+try:
+    from .openrouter import query_models_parallel, query_model
+    from .config import (
+        COUNCIL_MODELS, CHAIRMAN_MODEL,
+        get_council_models, get_chairman_model
+    )
+    from .web_search import get_search_context
+except ImportError:
+    from openrouter import query_models_parallel, query_model
+    from config import (
+        COUNCIL_MODELS, CHAIRMAN_MODEL,
+        get_council_models, get_chairman_model
+    )
+    from web_search import get_search_context
 
 
 # ═══════════════════════════════════════════════════════════════════════════
