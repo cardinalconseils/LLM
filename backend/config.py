@@ -39,10 +39,11 @@ CODE_CHAIRMAN_MODEL = "anthropic/claude-sonnet-4.5"
 # Image Mode - Image generation council
 IMAGE_COUNCIL_MODELS = [
     "openai/gpt-5-image",                    # GPT-5 with image generation
-    "google/gemini-2.5-flash-preview-image", # Gemini Flash Image (Nano ChatGPT equivalent)
+    "google/gemini-3-pro-image-preview",     # Nano Banana Pro - Gemini 3 Pro Image
+    "google/gemini-2.5-flash-image",         # Nano Banana - Gemini 2.5 Flash Image
     "qwen/qwen-vl-max",                      # Qwen VL for vision/image tasks
 ]
-IMAGE_CHAIRMAN_MODEL = "openai/gpt-5-image"
+IMAGE_CHAIRMAN_MODEL = "google/gemini-3-pro-image-preview"  # Nano Banana Pro as chairman
 
 # Image generation specific settings
 IMAGE_GENERATION_CONFIG = {
