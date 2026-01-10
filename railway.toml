@@ -3,6 +3,7 @@ builder = "nixpacks"
 
 [build.env]
 BUILD_VERSION = "0.2.0"
+NIXPACKS_NODE_VERSION = "22.12.0"
 
 [deploy]
 startCommand = "python run_backend.py"
