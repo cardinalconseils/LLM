@@ -14,6 +14,7 @@ LLM Council is a 3-stage deliberation system where multiple LLMs collaboratively
 - Contains `COUNCIL_MODELS` (list of OpenRouter model identifiers)
 - Contains `CHAIRMAN_MODEL` (model that synthesizes final answer)
 - Uses environment variable `OPENROUTER_API_KEY` from `.env`
+- Uses environment variable `TAVILY_API_KEY` from `.env` (for web search)
 - Backend runs on **port 8001** (NOT 8000 - user had another app on 8000)
 
 **`openrouter.py`**
@@ -23,7 +24,7 @@ LLM Council is a 3-stage deliberation system where multiple LLMs collaboratively
 - Graceful degradation: returns None on failure, continues with successful responses
 
 **`council.py`** - The Core Logic
-- `stage1_collect_responses()`: Parallel queries to all council models
+- `stage1_collect_responses()`: Parallel queries to all council models (with optional search context)
 - `stage2_collect_rankings()`:
   - Anonymizes responses as "Response A, B, C, etc."
   - Creates `label_to_model` mapping for de-anonymization
@@ -33,6 +34,15 @@ LLM Council is a 3-stage deliberation system where multiple LLMs collaboratively
 - `stage3_synthesize_final()`: Chairman synthesizes from all responses + rankings
 - `parse_ranking_from_text()`: Extracts "FINAL RANKING:" section, handles both numbered lists and plain format
 - `calculate_aggregate_rankings()`: Computes average rank position across all peer evaluations
+- `run_full_council()`: Orchestrates all stages, including web search pre-fetch
+
+**`web_search.py`** - Tavily Web Search Integration
+- `needs_web_search()`: Detects if query needs real-time information (keywords: "today", "latest", "2025", "price", "news", etc.)
+- `search_web()`: Calls Tavily API to fetch search results
+- `format_search_results()`: Formats results into context string for LLMs
+- `get_search_context()`: Main entry point - returns formatted search context or None
+- Uses environment variable `TAVILY_API_KEY` from `.env`
+- All council models receive identical search context for fair comparison
 
 **`storage.py`**
 - JSON-based conversation storage in `data/conversations/`
@@ -131,6 +141,23 @@ Models are hardcoded in `backend/config.py`. Chairman can be same or different f
 2. **CORS Issues**: Frontend must match allowed origins in `main.py` CORS middleware
 3. **Ranking Parse Failures**: If models don't follow format, fallback regex extracts any "Response X" patterns in order
 4. **Missing Metadata**: Metadata is ephemeral (not persisted), only available in API responses
+5. **Web Search Not Working**: Check `TAVILY_API_KEY` is set; search only triggers for specific keywords
+
+## Deployment (Railway)
+
+### Environment Variables Required
+**Backend service:**
+- `OPENROUTER_API_KEY` - For LLM API calls
+- `TAVILY_API_KEY` - For web search (optional but recommended)
+- `FRONTEND_URL` - Comma-separated allowed origins for CORS (e.g., `https://llm.example.com`)
+
+**Frontend service:**
+- `VITE_API_URL` - Backend API URL (e.g., `https://backend-production-xxx.up.railway.app`)
+- `NIXPACKS_NODE_VERSION` - Set to `20` for Vite 7 compatibility
+
+### Railway Configuration
+- Backend: Root directory `/` (uses root `railway.toml`)
+- Frontend: Root directory `frontend` (uses `frontend/railway.toml`)
 
 ## Future Enhancement Ideas
 
@@ -150,7 +177,11 @@ Use `test_openrouter.py` to verify API connectivity and test different model ide
 ```
 User Query
     ↓
-Stage 1: Parallel queries → [individual responses]
+Web Search Check → [if keywords detected: "today", "latest", "price", etc.]
+    ↓
+[Optional] Tavily Search → [formatted search context]
+    ↓
+Stage 1: Parallel queries (with search context) → [individual responses]
     ↓
 Stage 2: Anonymize → Parallel ranking queries → [evaluations + parsed rankings]
     ↓
@@ -158,9 +189,59 @@ Aggregate Rankings Calculation → [sorted by avg position]
     ↓
 Stage 3: Chairman synthesis with full context
     ↓
-Return: {stage1, stage2, stage3, metadata}
+Return: {stage1, stage2, stage3, metadata (includes web_search_used)}
     ↓
 Frontend: Display with tabs + validation UI
 ```
 
 The entire flow is async/parallel where possible to minimize latency.
+
+### Web Search Integration
+- Automatically triggers for queries needing real-time information
+- All council models receive **identical** search context (ensures fair comparison)
+- Metadata includes `web_search_used` boolean and `search_context` string
+- Graceful degradation: if Tavily fails or no API key, council proceeds without search
+
+## Claude Code Configuration (`.claude/`)
+
+The project includes Claude Code configuration files for enhanced development workflows.
+
+### Directory Structure
+```
+.claude/
+├── settings.json         # Project settings and code style preferences
+├── hooks.json            # Pre/post edit and commit hooks
+├── mcp.json              # MCP server configurations
+├── commands/             # Custom slash commands
+│   ├── dev.md            # /dev - Start development servers
+│   ├── status.md         # /status - Check system status
+│   ├── models.md         # /models - View/manage council models
+│   ├── api-test.md       # /api-test - Test OpenRouter connectivity
+│   ├── test-council.md   # /test-council - Run test query through council
+│   └── debug-ranking.md  # /debug-ranking - Debug ranking parse issues
+├── agents/               # Specialized agent definitions
+│   ├── council-debugger.md   # Debug council response issues
+│   ├── api-monitor.md        # Monitor API connectivity
+│   ├── frontend-helper.md    # Frontend React/CSS assistance
+│   └── prompt-engineer.md    # Optimize council prompts
+└── prompts/              # Reusable prompt templates
+    ├── add-council-model.md      # Add new model to council
+    ├── analyze-conversation.md   # Analyze conversation quality
+    └── optimize-stage2-prompt.md # Improve ranking prompt
+```
+
+### Available Commands
+- `/dev` - Start both backend and frontend servers
+- `/status` - Check server status, config, and API key
+- `/models` - View or modify council model configuration
+- `/api-test` - Test OpenRouter API connectivity
+- `/test-council` - Run a test query through the full pipeline
+- `/debug-ranking` - Analyze ranking parse failures
+
+### Hooks
+- **PreEdit**: Reminds about relative imports for backend files
+- **PostEdit**: Warns when config.py changes require restart
+- **PreCommit**: Prevents committing .env files or API keys
+
+### Agents
+Use `@council-debugger`, `@api-monitor`, `@frontend-helper`, or `@prompt-engineer` for specialized assistance with different aspects of the project.
