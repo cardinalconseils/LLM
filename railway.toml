@@ -7,3 +7,4 @@ healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
+# Railway deployment trigger: Sat Jan 10 12:31:18 EST 2026
