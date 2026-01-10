@@ -27,7 +27,7 @@ const TabsList = forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      'inline-flex h-11 items-center justify-center rounded-xl bg-[var(--color-background-tertiary)] p-1 text-[var(--color-foreground-secondary)]',
+      'inline-flex h-11 items-center justify-center rounded-xl bg-background-tertiary p-1 text-foreground-secondary',
       className
     )}
     role="tablist"
@@ -47,10 +47,10 @@ const TabsTrigger = forwardRef(({ className, value, ...props }, ref) => {
       aria-selected={isActive}
       onClick={() => context?.onValueChange(value)}
       className={cn(
-        'inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] disabled:pointer-events-none disabled:opacity-50',
+        'inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50',
         isActive
-          ? 'bg-white text-[var(--color-foreground)] shadow-sm'
-          : 'text-[var(--color-foreground-secondary)] hover:text-[var(--color-foreground)]',
+          ? 'bg-white text-foreground shadow-sm'
+          : 'text-foreground-secondary hover:text-foreground',
         className
       )}
       {...props}
@@ -70,7 +70,7 @@ const TabsContent = forwardRef(({ className, value, ...props }, ref) => {
       ref={ref}
       role="tabpanel"
       className={cn(
-        'mt-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]',
+        'mt-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
         className
       )}
       {...props}

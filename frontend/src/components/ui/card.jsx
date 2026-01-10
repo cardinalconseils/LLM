@@ -5,7 +5,7 @@ const Card = forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      'rounded-2xl bg-white border border-[var(--color-border-light)] shadow-sm',
+      'rounded-2xl bg-white border border-border-light shadow-sm',
       className
     )}
     {...props}
@@ -26,7 +26,7 @@ const CardTitle = forwardRef(({ className, ...props }, ref) => (
   <h3
     ref={ref}
     className={cn(
-      'text-lg font-semibold leading-none tracking-tight text-[var(--color-foreground)]',
+      'text-lg font-semibold leading-none tracking-tight text-foreground',
       className
     )}
     {...props}
@@ -37,7 +37,7 @@ CardTitle.displayName = 'CardTitle'
 const CardDescription = forwardRef(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn('text-sm text-[var(--color-foreground-secondary)]', className)}
+    className={cn('text-sm text-foreground-secondary', className)}
     {...props}
   />
 ))

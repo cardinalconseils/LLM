@@ -3,22 +3,22 @@ import { cva } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
         default:
-          'bg-[var(--color-primary)] text-white shadow-sm hover:bg-[var(--color-primary-hover)] active:bg-[var(--color-primary-active)]',
+          'bg-primary text-white shadow-sm hover:bg-primary-hover active:bg-primary-active',
         secondary:
-          'bg-[var(--color-background-tertiary)] text-[var(--color-foreground)] hover:bg-[var(--color-border)]',
+          'bg-background-tertiary text-foreground hover:bg-border',
         outline:
-          'border border-[var(--color-border)] bg-transparent text-[var(--color-foreground)] hover:bg-[var(--color-background-secondary)]',
+          'border border-border bg-transparent text-foreground hover:bg-background-secondary',
         ghost:
-          'text-[var(--color-foreground)] hover:bg-[var(--color-background-secondary)]',
+          'text-foreground hover:bg-background-secondary',
         destructive:
-          'bg-[var(--color-error)] text-white hover:bg-[var(--color-error)]/90',
+          'bg-error text-white hover:bg-error/90',
         success:
-          'bg-[var(--color-success)] text-white hover:bg-[var(--color-success)]/90',
+          'bg-success text-white hover:bg-success/90',
       },
       size: {
         default: 'h-10 px-4 py-2',

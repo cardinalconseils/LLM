@@ -198,7 +198,7 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[var(--color-background-secondary)]">
+    <div className="flex h-screen w-screen overflow-hidden bg-background-secondary">
       {/* Mobile Menu Toggle */}
       <Button
         variant="ghost"

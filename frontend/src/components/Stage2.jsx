@@ -27,15 +27,15 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
   return (
     <Card className="animate-fade-in-up overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 p-5 border-b border-[var(--color-border-light)]">
-        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--color-info)]/10 text-[var(--color-info)]">
+      <div className="flex items-center gap-3 p-5 border-b border-border-light">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-info/10 text-info">
           <span className="text-sm font-semibold">2</span>
         </div>
         <div className="flex-1">
-          <h3 className="text-sm font-semibold text-[var(--color-foreground)]">
+          <h3 className="text-sm font-semibold text-foreground">
             Peer Rankings
           </h3>
-          <p className="text-xs text-[var(--color-foreground-tertiary)]">
+          <p className="text-xs text-foreground-tertiary">
             Anonymous cross-evaluation
           </p>
         </div>
@@ -44,14 +44,14 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
       <CardContent className="p-5 space-y-5">
         {/* Aggregate Rankings */}
         {aggregateRankings && aggregateRankings.length > 0 && (
-          <div className="bg-[var(--color-background-secondary)] rounded-xl p-4">
+          <div className="bg-background-secondary rounded-xl p-4">
             <div className="flex items-center gap-2 mb-4">
-              <BarChart3 className="w-4 h-4 text-[var(--color-foreground-tertiary)]" />
+              <BarChart3 className="w-4 h-4 text-foreground-tertiary" />
               <div>
-                <h4 className="text-sm font-medium text-[var(--color-foreground)]">
+                <h4 className="text-sm font-medium text-foreground">
                   Aggregate Rankings
                 </h4>
-                <span className="text-xs text-[var(--color-foreground-tertiary)]">
+                <span className="text-xs text-foreground-tertiary">
                   Combined peer evaluations (lower is better)
                 </span>
               </div>
@@ -66,8 +66,8 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
                     className={cn(
                       'flex items-center gap-3 p-3 rounded-lg transition-colors',
                       index === 0
-                        ? 'bg-[var(--color-success-bg)] border border-[var(--color-success)]/20'
-                        : 'bg-white border border-[var(--color-border-light)]'
+                        ? 'bg-background-tertiary border border-primary/20'
+                        : 'bg-white border border-border-light'
                     )}
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
@@ -75,8 +75,8 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
                       className={cn(
                         'flex items-center justify-center w-7 h-7 rounded-full text-xs font-semibold',
                         index === 0
-                          ? 'bg-[var(--color-success)] text-white'
-                          : 'bg-[var(--color-background-tertiary)] text-[var(--color-foreground-secondary)]'
+                          ? 'bg-primary text-white'
+                          : 'bg-background-tertiary text-foreground-secondary'
                       )}
                     >
                       {index === 0 ? (
@@ -85,14 +85,14 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
                         `#${index + 1}`
                       )}
                     </div>
-                    <span className="flex-1 text-sm font-medium text-[var(--color-foreground)]">
+                    <span className="flex-1 text-sm font-medium text-foreground">
                       {modelName}
                     </span>
                     <div className="flex items-center gap-3 text-xs">
-                      <span className="font-semibold text-[var(--color-foreground)]">
+                      <span className="font-semibold text-foreground">
                         {agg.average_rank.toFixed(2)}
                       </span>
-                      <span className="text-[var(--color-foreground-tertiary)]">
+                      <span className="text-foreground-tertiary">
                         {agg.rankings_count} votes
                       </span>
                     </div>
@@ -106,10 +106,10 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
         {/* Raw Evaluations */}
         <div>
           <div className="mb-3">
-            <h4 className="text-sm font-medium text-[var(--color-foreground)]">
+            <h4 className="text-sm font-medium text-foreground">
               Raw Evaluations
             </h4>
-            <p className="text-xs text-[var(--color-foreground-tertiary)]">
+            <p className="text-xs text-foreground-tertiary">
               Model names shown in <strong>bold</strong> were anonymized during evaluation.
             </p>
           </div>
@@ -133,11 +133,11 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
             {rankings.map((rank) => (
               <TabsContent key={rank.model} value={rank.model}>
                 <div className="flex items-center gap-2 mb-3">
-                  <CheckCircle className="w-4 h-4 text-[var(--color-foreground-tertiary)]" />
+                  <CheckCircle className="w-4 h-4 text-foreground-tertiary" />
                   <Badge variant="secondary">{rank.model}</Badge>
                 </div>
 
-                <div className="bg-[var(--color-background-secondary)] rounded-xl">
+                <div className="bg-background-secondary rounded-xl">
                   <div className="markdown-content">
                     <ReactMarkdown>
                       {deAnonymizeText(rank.ranking, labelToModel)}
@@ -147,10 +147,10 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
 
                 {/* Extracted Ranking */}
                 {rank.parsed_ranking && rank.parsed_ranking.length > 0 && (
-                  <div className="mt-4 p-4 bg-[var(--color-info-bg)] rounded-xl border border-[var(--color-info)]/20">
+                  <div className="mt-4 p-4 bg-background-secondary rounded-xl border border-border-light">
                     <div className="flex items-center gap-2 mb-3">
-                      <ClipboardList className="w-4 h-4 text-[var(--color-info)]" />
-                      <span className="text-sm font-medium text-[var(--color-foreground)]">
+                      <ClipboardList className="w-4 h-4 text-foreground-tertiary" />
+                      <span className="text-sm font-medium text-foreground">
                         Extracted Ranking
                       </span>
                     </div>
@@ -164,10 +164,10 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
                             key={i}
                             className="flex items-center gap-2 text-sm"
                           >
-                            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[var(--color-info)]/20 text-[var(--color-info)] text-xs font-medium">
+                            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-background-tertiary text-foreground text-xs font-medium">
                               {i + 1}
                             </span>
-                            <span className="text-[var(--color-foreground)]">
+                            <span className="text-foreground">
                               {modelName}
                             </span>
                           </li>

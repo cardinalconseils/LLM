@@ -16,15 +16,15 @@ export default function Stage1({ responses }) {
   return (
     <Card className="animate-fade-in-up overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 p-5 border-b border-[var(--color-border-light)]">
-        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+      <div className="flex items-center gap-3 p-5 border-b border-border-light">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary">
           <span className="text-sm font-semibold">1</span>
         </div>
         <div className="flex-1">
-          <h3 className="text-sm font-semibold text-[var(--color-foreground)]">
+          <h3 className="text-sm font-semibold text-foreground">
             Individual Responses
           </h3>
-          <p className="text-xs text-[var(--color-foreground-tertiary)]">
+          <p className="text-xs text-foreground-tertiary">
             {responses.length} models responded
           </p>
         </div>
@@ -52,10 +52,10 @@ export default function Stage1({ responses }) {
             return (
               <TabsContent key={resp.model} value={resp.model}>
                 <div className="flex items-center gap-2 mb-3">
-                  <Layers className="w-4 h-4 text-[var(--color-foreground-tertiary)]" />
+                  <Layers className="w-4 h-4 text-foreground-tertiary" />
                   <Badge variant="secondary">{resp.model}</Badge>
                 </div>
-                <div className="bg-[var(--color-background-secondary)] rounded-xl">
+                <div className="bg-background-secondary rounded-xl">
                   <div className="markdown-content">
                     <ReactMarkdown>{resp.response}</ReactMarkdown>
                   </div>

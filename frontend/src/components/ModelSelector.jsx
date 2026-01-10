@@ -115,8 +115,8 @@ export default function ModelSelector({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-[var(--color-border-light)]">
-          <h2 className="text-lg font-semibold text-[var(--color-foreground)]">
+        <div className="flex items-center justify-between p-5 border-b border-border-light">
+          <h2 className="text-lg font-semibold text-foreground">
             Council Configuration
           </h2>
           <Button variant="ghost" size="iconSm" onClick={onClose}>
@@ -126,8 +126,8 @@ export default function ModelSelector({
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <Loader2 className="w-8 h-8 text-[var(--color-primary)] animate-spin" />
-            <span className="text-sm text-[var(--color-foreground-secondary)]">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+            <span className="text-sm text-foreground-secondary">
               Loading configuration...
             </span>
           </div>
@@ -136,10 +136,10 @@ export default function ModelSelector({
             <div className="p-5 space-y-6">
               {/* Mode Selection */}
               <section>
-                <h3 className="text-sm font-semibold text-[var(--color-foreground)] mb-1">
+                <h3 className="text-sm font-semibold text-foreground mb-1">
                   Council Mode
                 </h3>
-                <p className="text-xs text-[var(--color-foreground-tertiary)] mb-3">
+                <p className="text-xs text-foreground-tertiary mb-3">
                   Choose a specialized council for your task
                 </p>
                 <div className="grid grid-cols-3 gap-2">
@@ -152,25 +152,25 @@ export default function ModelSelector({
                         className={cn(
                           'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200',
                           mode === key
-                            ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5'
-                            : 'border-[var(--color-border-light)] hover:border-[var(--color-border)] bg-white'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border-light hover:border-border bg-white'
                         )}
                       >
                         <div
                           className={cn(
                             'flex items-center justify-center w-10 h-10 rounded-xl transition-colors',
                             mode === key
-                              ? 'bg-[var(--color-primary)] text-white'
-                              : 'bg-[var(--color-background-secondary)] text-[var(--color-foreground-secondary)]'
+                              ? 'bg-primary text-white'
+                              : 'bg-background-secondary text-foreground-secondary'
                           )}
                         >
                           <Icon className="w-5 h-5" />
                         </div>
                         <div className="text-center">
-                          <div className="text-sm font-medium text-[var(--color-foreground)]">
+                          <div className="text-sm font-medium text-foreground">
                             {config.name}
                           </div>
-                          <div className="text-[10px] text-[var(--color-foreground-tertiary)] line-clamp-1">
+                          <div className="text-[10px] text-foreground-tertiary line-clamp-1">
                             {config.description}
                           </div>
                         </div>
@@ -184,10 +184,10 @@ export default function ModelSelector({
               <section>
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="text-sm font-semibold text-[var(--color-foreground)]">
+                    <h3 className="text-sm font-semibold text-foreground">
                       Council Members
                     </h3>
-                    <p className="text-xs text-[var(--color-foreground-tertiary)]">
+                    <p className="text-xs text-foreground-tertiary">
                       {activeModels.length} models will deliberate on your question
                     </p>
                   </div>
@@ -203,20 +203,20 @@ export default function ModelSelector({
                   {activeModels.map((modelId) => (
                     <div
                       key={modelId}
-                      className="flex items-center gap-2 px-3 py-1.5 bg-[var(--color-primary)]/10 rounded-full border border-[var(--color-primary)]/20"
+                      className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-full border border-primary/20"
                     >
-                      <span className="text-sm font-medium text-[var(--color-primary)]">
+                      <span className="text-sm font-medium text-primary">
                         {modelId.split('/').pop()}
                       </span>
-                      <span className="text-xs text-[var(--color-primary)]/60">
+                      <span className="text-xs text-primary/60">
                         {modelId.split('/')[0]}
                       </span>
                       {customModels && (
                         <button
                           onClick={() => toggleModel(modelId)}
-                          className="p-0.5 hover:bg-[var(--color-primary)]/20 rounded-full transition-colors"
+                          className="p-0.5 hover:bg-primary/20 rounded-full transition-colors"
                         >
-                          <X className="w-3 h-3 text-[var(--color-primary)]" />
+                          <X className="w-3 h-3 text-primary" />
                         </button>
                       )}
                     </div>
@@ -226,21 +226,21 @@ export default function ModelSelector({
 
               {/* Chairman Model */}
               <section>
-                <h3 className="text-sm font-semibold text-[var(--color-foreground)] mb-1">
+                <h3 className="text-sm font-semibold text-foreground mb-1">
                   Chairman Model
                 </h3>
-                <p className="text-xs text-[var(--color-foreground-tertiary)] mb-3">
+                <p className="text-xs text-foreground-tertiary mb-3">
                   The chairman synthesizes the final answer
                 </p>
-                <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-[var(--color-warning-bg)] to-transparent rounded-xl border border-[var(--color-warning)]/20">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--color-warning)] text-white">
+                <div className="flex items-center gap-2 p-3 bg-background-secondary rounded-xl border border-border-light">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white">
                     <Star className="w-4 h-4 fill-current" />
                   </div>
                   <div>
-                    <span className="block text-sm font-medium text-[var(--color-foreground)]">
+                    <span className="block text-sm font-medium text-foreground">
                       {activeChairman.split('/').pop()}
                     </span>
-                    <span className="text-xs text-[var(--color-foreground-tertiary)]">
+                    <span className="text-xs text-foreground-tertiary">
                       {activeChairman.split('/')[0]}
                     </span>
                   </div>
@@ -249,10 +249,10 @@ export default function ModelSelector({
 
               {/* Add Models */}
               <section>
-                <h3 className="text-sm font-semibold text-[var(--color-foreground)] mb-1">
+                <h3 className="text-sm font-semibold text-foreground mb-1">
                   Add Models
                 </h3>
-                <p className="text-xs text-[var(--color-foreground-tertiary)] mb-3">
+                <p className="text-xs text-foreground-tertiary mb-3">
                   Click to add models to the council
                 </p>
 
@@ -275,20 +275,20 @@ export default function ModelSelector({
                       className={cn(
                         'flex items-center justify-between p-3 rounded-xl border transition-all duration-200 text-left',
                         isModelSelected(model.id)
-                          ? 'border-[var(--color-success)] bg-[var(--color-success-bg)]'
-                          : 'border-[var(--color-border-light)] hover:border-[var(--color-border)] bg-white'
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border-light hover:border-border bg-white'
                       )}
                     >
                       <div>
-                        <div className="text-sm font-medium text-[var(--color-foreground)]">
+                        <div className="text-sm font-medium text-foreground">
                           {model.name}
                         </div>
-                        <div className="text-xs text-[var(--color-foreground-tertiary)]">
+                        <div className="text-xs text-foreground-tertiary">
                           {model.provider}
                         </div>
                       </div>
                       {isModelSelected(model.id) && (
-                        <Check className="w-4 h-4 text-[var(--color-success)]" />
+                        <Check className="w-4 h-4 text-primary" />
                       )}
                     </button>
                   ))}
@@ -310,25 +310,25 @@ export default function ModelSelector({
                 {showAllModels && (
                   <div className="space-y-3">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-foreground-tertiary)]" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-tertiary" />
                       <input
                         type="text"
                         placeholder="Search models..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-background-secondary)] border border-[var(--color-border-light)] rounded-xl text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-foreground-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                        className="w-full pl-9 pr-4 py-2.5 bg-background-secondary border border-border-light rounded-xl text-sm text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                       />
                     </div>
 
                     {loadingAllModels ? (
                       <div className="flex items-center justify-center gap-2 py-8">
-                        <Loader2 className="w-5 h-5 text-[var(--color-primary)] animate-spin" />
-                        <span className="text-sm text-[var(--color-foreground-secondary)]">
+                        <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                        <span className="text-sm text-foreground-secondary">
                           Loading models...
                         </span>
                       </div>
                     ) : (
-                      <div className="max-h-60 overflow-y-auto space-y-1 rounded-xl border border-[var(--color-border-light)] p-1">
+                      <div className="max-h-60 overflow-y-auto space-y-1 rounded-xl border border-border-light p-1">
                         {filteredAllModels.slice(0, 50).map((model) => (
                           <button
                             key={model.id}
@@ -346,25 +346,25 @@ export default function ModelSelector({
                             className={cn(
                               'flex items-center justify-between w-full p-2.5 rounded-lg transition-colors text-left',
                               isModelSelected(model.id)
-                                ? 'bg-[var(--color-success-bg)]'
-                                : 'hover:bg-[var(--color-background-secondary)]'
+                                ? 'bg-success-bg'
+                                : 'hover:bg-background-secondary'
                             )}
                           >
                             <div>
-                              <div className="text-sm font-medium text-[var(--color-foreground)]">
+                              <div className="text-sm font-medium text-foreground">
                                 {model.name}
                               </div>
-                              <div className="text-xs text-[var(--color-foreground-tertiary)]">
+                              <div className="text-xs text-foreground-tertiary">
                                 {model.id}
                               </div>
                             </div>
                             {isModelSelected(model.id) && (
-                              <Check className="w-4 h-4 text-[var(--color-success)]" />
+                              <Check className="w-4 h-4 text-primary" />
                             )}
                           </button>
                         ))}
                         {filteredAllModels.length > 50 && (
-                          <div className="text-center py-2 text-xs text-[var(--color-foreground-tertiary)]">
+                          <div className="text-center py-2 text-xs text-foreground-tertiary">
                             +{filteredAllModels.length - 50} more models. Refine your search.
                           </div>
                         )}

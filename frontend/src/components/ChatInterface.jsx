@@ -121,17 +121,17 @@ export default function ChatInterface({
   // Empty state - no conversation selected
   if (!conversation) {
     return (
-      <main className="flex-1 flex flex-col items-center justify-center p-8 bg-[var(--color-background-secondary)]">
+      <main className="flex-1 flex flex-col items-center justify-center p-8 bg-background-secondary">
         <div className="w-full max-w-2xl text-center">
           {/* Logo */}
-          <div className="flex items-center justify-center w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-[var(--color-primary)] to-blue-600 text-white mb-6 shadow-lg">
+          <div className="flex items-center justify-center w-20 h-20 mx-auto rounded-3xl bg-primary text-white mb-6 shadow-lg">
             <Sparkles className="w-10 h-10" />
           </div>
 
-          <h2 className="text-2xl font-semibold text-[var(--color-foreground)] mb-2">
+          <h2 className="text-2xl font-semibold text-foreground mb-2">
             Welcome to LLM Council
           </h2>
-          <p className="text-[var(--color-foreground-secondary)] mb-8">
+          <p className="text-foreground-secondary mb-8">
             Harness the collective intelligence of multiple AI models
           </p>
 
@@ -145,28 +145,28 @@ export default function ChatInterface({
                   'relative flex flex-col items-start gap-3 p-5 rounded-2xl text-left transition-all duration-200',
                   'border-2 bg-white hover:shadow-md',
                   mode === key
-                    ? 'border-[var(--color-primary)] shadow-md'
-                    : 'border-transparent hover:border-[var(--color-border)]'
+                    ? 'border-primary shadow-md'
+                    : 'border-transparent hover:border-border'
                 )}
               >
                 <div
                   className={cn(
                     'flex items-center justify-center w-10 h-10 rounded-xl transition-colors',
                     mode === key
-                      ? 'bg-[var(--color-primary)] text-white'
-                      : 'bg-[var(--color-background-secondary)] text-[var(--color-foreground-secondary)]'
+                      ? 'bg-primary text-white'
+                      : 'bg-background-secondary text-foreground-secondary'
                   )}
                 >
                   <Icon className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="font-medium text-[var(--color-foreground)]">{name}</div>
-                  <div className="text-xs text-[var(--color-foreground-tertiary)] mt-1">
+                  <div className="font-medium text-foreground">{name}</div>
+                  <div className="text-xs text-foreground-tertiary mt-1">
                     {description}
                   </div>
                 </div>
                 {mode === key && (
-                  <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-[var(--color-primary)]" />
+                  <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-primary" />
                 )}
               </button>
             ))}
@@ -198,19 +198,19 @@ export default function ChatInterface({
   }
 
   return (
-    <main className="flex-1 flex flex-col h-full bg-[var(--color-background-secondary)] overflow-hidden">
+    <main className="flex-1 flex flex-col h-full bg-background-secondary overflow-hidden">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto p-6">
           {conversation.messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-[var(--color-background-tertiary)] text-[var(--color-foreground-tertiary)] mb-4">
+              <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-background-tertiary text-foreground-tertiary mb-4">
                 <MessageSquare className="w-8 h-8" />
               </div>
-              <h2 className="text-xl font-semibold text-[var(--color-foreground)] mb-2">
+              <h2 className="text-xl font-semibold text-foreground mb-2">
                 Start a conversation
               </h2>
-              <p className="text-[var(--color-foreground-secondary)]">
+              <p className="text-foreground-secondary">
                 Ask a question to consult the LLM Council
               </p>
             </div>
@@ -224,11 +224,11 @@ export default function ChatInterface({
                 >
                   {msg.role === 'user' ? (
                     <div className="flex gap-4">
-                      <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--color-foreground)] text-white shrink-0">
+                      <div className="flex items-center justify-center w-9 h-9 rounded-full bg-foreground text-white shrink-0">
                         <User className="w-4 h-4" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs font-medium text-[var(--color-foreground-secondary)] mb-1">
+                        <div className="text-xs font-medium text-foreground-secondary mb-1">
                           You
                         </div>
                         <Card className="inline-block max-w-full">
@@ -240,11 +240,11 @@ export default function ChatInterface({
                     </div>
                   ) : (
                     <div className="flex gap-4">
-                      <div className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-blue-600 text-white shrink-0">
+                      <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary text-white shrink-0">
                         <Sparkles className="w-4 h-4" />
                       </div>
                       <div className="flex-1 min-w-0 space-y-4">
-                        <div className="text-xs font-medium text-[var(--color-foreground-secondary)]">
+                        <div className="text-xs font-medium text-foreground-secondary">
                           LLM Council
                         </div>
 
@@ -283,7 +283,7 @@ export default function ChatInterface({
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-[var(--color-border-light)] bg-white p-4">
+      <div className="border-t border-border-light bg-white p-4">
         <form
           onSubmit={handleSubmit}
           onDragOver={handleDragOver}
@@ -293,8 +293,8 @@ export default function ChatInterface({
         >
           {/* Drag Overlay */}
           {isDragOver && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[var(--color-primary)]/5 border-2 border-dashed border-[var(--color-primary)] rounded-2xl z-10">
-              <div className="text-[var(--color-primary)] font-medium">Drop files here</div>
+            <div className="absolute inset-0 flex items-center justify-center bg-primary/5 border-2 border-dashed border-primary rounded-2xl z-10">
+              <div className="text-primary font-medium">Drop files here</div>
             </div>
           )}
 
@@ -304,19 +304,19 @@ export default function ChatInterface({
               {attachments.map((file, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-[var(--color-background-secondary)] rounded-lg text-sm"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-background-secondary rounded-lg text-sm"
                 >
-                  <Paperclip className="w-3 h-3 text-[var(--color-foreground-tertiary)]" />
-                  <span className="text-[var(--color-foreground)]">{file.name}</span>
-                  <span className="text-[var(--color-foreground-tertiary)]">
+                  <Paperclip className="w-3 h-3 text-foreground-tertiary" />
+                  <span className="text-foreground">{file.name}</span>
+                  <span className="text-foreground-tertiary">
                     {formatFileSize(file.size)}
                   </span>
                   <button
                     type="button"
                     onClick={() => removeAttachment(index)}
-                    className="p-0.5 hover:bg-[var(--color-background-tertiary)] rounded"
+                    className="p-0.5 hover:bg-background-tertiary rounded"
                   >
-                    <X className="w-3 h-3 text-[var(--color-foreground-tertiary)]" />
+                    <X className="w-3 h-3 text-foreground-tertiary" />
                   </button>
                 </div>
               ))}
@@ -399,22 +399,22 @@ export default function ChatInterface({
           </div>
 
           {/* Footer Hints */}
-          <div className="flex items-center justify-between mt-2 text-xs text-[var(--color-foreground-tertiary)]">
+          <div className="flex items-center justify-between mt-2 text-xs text-foreground-tertiary">
             <div className="flex items-center gap-3">
               <span>
-                <kbd className="px-1.5 py-0.5 bg-[var(--color-background-secondary)] rounded text-[10px]">
+                <kbd className="px-1.5 py-0.5 bg-background-secondary rounded text-[10px]">
                   Enter
                 </kbd>{' '}
                 to send
               </span>
               <span>
-                <kbd className="px-1.5 py-0.5 bg-[var(--color-background-secondary)] rounded text-[10px]">
+                <kbd className="px-1.5 py-0.5 bg-background-secondary rounded text-[10px]">
                   Shift+Enter
                 </kbd>{' '}
                 for new line
               </span>
             </div>
-            <div className={cn(input.length > MAX_CHARS * 0.9 && 'text-[var(--color-warning)]')}>
+            <div className={cn(input.length > MAX_CHARS * 0.9 && 'text-warning')}>
               {input.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
             </div>
           </div>
@@ -441,24 +441,24 @@ function LoadingState({ stage, text, variant = 'default' }) {
       className={cn(
         'flex items-center gap-3 p-4 rounded-2xl',
         variant === 'success'
-          ? 'bg-[var(--color-success-bg)]'
-          : 'bg-[var(--color-background-secondary)]'
+          ? 'bg-success-bg'
+          : 'bg-background-secondary'
       )}
     >
       <div className="flex gap-1">
-        <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
+        <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
         <span
-          className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse"
+          className="w-2 h-2 rounded-full bg-primary animate-pulse"
           style={{ animationDelay: '150ms' }}
         />
         <span
-          className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse"
+          className="w-2 h-2 rounded-full bg-primary animate-pulse"
           style={{ animationDelay: '300ms' }}
         />
       </div>
       <div>
-        <span className="font-medium text-[var(--color-foreground)]">Stage {stage}</span>
-        <span className="text-[var(--color-foreground-secondary)] ml-2">{text}</span>
+        <span className="font-medium text-foreground">Stage {stage}</span>
+        <span className="text-foreground-secondary ml-2">{text}</span>
       </div>
     </div>
   )
