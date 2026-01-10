@@ -1,4 +1,7 @@
-"""Entry point for running the backend on Railway."""
+"""Entry point for running the backend on Railway.
+
+Version: 0.2.0 - Multi-mode council release
+"""
 import os
 import uvicorn
 
