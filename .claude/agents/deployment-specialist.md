@@ -75,7 +75,7 @@ startCommand = "npm run preview -- --host --port $PORT"
 | Variable | Purpose | Required |
 |----------|---------|----------|
 | `VITE_API_URL` | Backend API endpoint | Yes |
-| `NIXPACKS_NODE_VERSION` | Node.js version (20) | Yes |
+| `NIXPACKS_NODE_VERSION` | Node.js version (22) | Yes |
 
 ## GitHub Actions Workflows
 
@@ -102,7 +102,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       - run: cd frontend && npm ci
       - run: cd frontend && npm run build
 ```
@@ -133,6 +133,7 @@ jobs:
 | Port binding | Wrong PORT env | Use Railway's $PORT variable |
 | CORS errors | FRONTEND_URL not set | Add allowed origins |
 | Health check fails | Wrong path/timeout | Verify healthcheckPath |
+| EBADENGINE npm warn | Node version mismatch | Update NIXPACKS_NODE_VERSION to 22 |
 
 ### Common GitHub Actions Issues
 

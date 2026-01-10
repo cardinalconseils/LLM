@@ -201,7 +201,7 @@ Models are hardcoded in `backend/config.py`. Chairman can be same or different f
 
 **Frontend service:**
 - `VITE_API_URL` - Backend API URL (e.g., `https://backend-production-xxx.up.railway.app`)
-- `NIXPACKS_NODE_VERSION` - Set to `20` for Vite 7 compatibility
+- `NIXPACKS_NODE_VERSION` - Set to `22` for Vite 7 and @vitejs/plugin-react@5.x compatibility
 
 ### Railway Configuration
 - Backend: Root directory `/` (uses root `railway.toml`)
