@@ -1,14 +1,43 @@
-"""3-stage LLM Council orchestration."""
+"""3-stage LLM Council orchestration with multi-mode support."""
 
 from typing import List, Dict, Any, Tuple, Optional
 from .openrouter import query_models_parallel, query_model
-from .config import COUNCIL_MODELS, CHAIRMAN_MODEL
+from .config import (
+    COUNCIL_MODELS, CHAIRMAN_MODEL,
+    get_council_models, get_chairman_model
+)
 from .web_search import get_search_context
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Mode-specific prompt templates
+# ═══════════════════════════════════════════════════════════════════════════
+
+CODE_MODE_SYSTEM_PROMPT = """You are an expert software engineer participating in a code review council.
+Focus on:
+- Code correctness and best practices
+- Security considerations
+- Performance optimization
+- Clean, maintainable code
+- Clear explanations of your reasoning
+
+Provide your response with code examples when appropriate, using proper markdown code blocks."""
+
+IMAGE_MODE_SYSTEM_PROMPT = """You are a creative AI artist participating in an image generation council.
+Focus on:
+- Interpreting the user's creative vision
+- Generating high-quality, detailed images
+- Artistic composition and aesthetics
+- Following the prompt instructions precisely
+
+Generate an image based on the user's description."""
 
 
 async def stage1_collect_responses(
     user_query: str,
-    search_context: Optional[str] = None
+    search_context: Optional[str] = None,
+    mode: str = "chat",
+    custom_models: Optional[List[str]] = None
 ) -> List[Dict[str, Any]]:
     """
     Stage 1: Collect individual responses from all council models.
@@ -16,13 +45,28 @@ async def stage1_collect_responses(
     Args:
         user_query: The user's question
         search_context: Optional web search results to include
+        mode: Council mode - "chat", "code", or "image"
+        custom_models: Optional list of models to override defaults
 
     Returns:
-        List of dicts with 'model' and 'response' keys
+        List of dicts with 'model', 'response', and optional 'images' keys
     """
-    # Build the prompt, optionally including search context
-    if search_context:
-        prompt = f"""The following web search results may be helpful for answering the question:
+    # Get mode-specific models or use custom models if provided
+    council_models = custom_models if custom_models else get_council_models(mode)
+    enable_image_generation = (mode == "image")
+
+    # Build the prompt based on mode
+    if mode == "code":
+        system_prompt = CODE_MODE_SYSTEM_PROMPT
+        prompt = f"Code Task:\n\n{user_query}"
+    elif mode == "image":
+        system_prompt = IMAGE_MODE_SYSTEM_PROMPT
+        prompt = f"Image Generation Request:\n\n{user_query}"
+    else:
+        system_prompt = None
+        # Build the prompt, optionally including search context
+        if search_context:
+            prompt = f"""The following web search results may be helpful for answering the question:
 
 {search_context}
 
@@ -31,29 +75,43 @@ async def stage1_collect_responses(
 Question: {user_query}
 
 Please provide a comprehensive answer, using the search results above if relevant."""
-    else:
-        prompt = user_query
+        else:
+            prompt = user_query
 
-    messages = [{"role": "user", "content": prompt}]
+    # Build messages with optional system prompt
+    messages = []
+    if system_prompt:
+        messages.append({"role": "system", "content": system_prompt})
+    messages.append({"role": "user", "content": prompt})
 
     # Query all models in parallel
-    responses = await query_models_parallel(COUNCIL_MODELS, messages)
+    responses = await query_models_parallel(
+        council_models,
+        messages,
+        enable_image_generation=enable_image_generation
+    )
 
     # Format results
     stage1_results = []
     for model, response in responses.items():
         if response is not None:  # Only include successful responses
-            stage1_results.append({
+            result = {
                 "model": model,
                 "response": response.get('content', '')
-            })
+            }
+            # Include images if present (for image mode)
+            if response.get('images'):
+                result['images'] = response['images']
+            stage1_results.append(result)
 
     return stage1_results
 
 
 async def stage2_collect_rankings(
     user_query: str,
-    stage1_results: List[Dict[str, Any]]
+    stage1_results: List[Dict[str, Any]],
+    mode: str = "chat",
+    custom_models: Optional[List[str]] = None
 ) -> Tuple[List[Dict[str, Any]], Dict[str, str]]:
     """
     Stage 2: Each model ranks the anonymized responses.
@@ -61,10 +119,15 @@ async def stage2_collect_rankings(
     Args:
         user_query: The original user query
         stage1_results: Results from Stage 1
+        mode: Council mode - "chat", "code", or "image"
+        custom_models: Optional list of models to override defaults
 
     Returns:
         Tuple of (rankings list, label_to_model mapping)
     """
+    # Get mode-specific models or use custom models if provided
+    council_models = custom_models if custom_models else get_council_models(mode)
+
     # Create anonymized labels for responses (Response A, Response B, etc.)
     labels = [chr(65 + i) for i in range(len(stage1_results))]  # A, B, C, ...
 
@@ -74,13 +137,45 @@ async def stage2_collect_rankings(
         for label, result in zip(labels, stage1_results)
     }
 
-    # Build the ranking prompt
-    responses_text = "\n\n".join([
-        f"Response {label}:\n{result['response']}"
-        for label, result in zip(labels, stage1_results)
-    ])
+    # Build the response text based on mode
+    if mode == "image":
+        # For image mode, include both text and image info
+        responses_text = "\n\n".join([
+            f"Response {label}:\n{result['response']}" +
+            (f"\n[Generated {len(result.get('images', []))} image(s)]" if result.get('images') else "")
+            for label, result in zip(labels, stage1_results)
+        ])
+        mode_context = "image generation task"
+        evaluation_criteria = """
+- Quality and accuracy of the generated image
+- Adherence to the prompt instructions
+- Artistic composition and aesthetics
+- Creativity and interpretation"""
+    elif mode == "code":
+        responses_text = "\n\n".join([
+            f"Response {label}:\n{result['response']}"
+            for label, result in zip(labels, stage1_results)
+        ])
+        mode_context = "code generation/review task"
+        evaluation_criteria = """
+- Code correctness and functionality
+- Best practices and clean code principles
+- Security considerations
+- Performance and efficiency
+- Clarity of explanations"""
+    else:
+        responses_text = "\n\n".join([
+            f"Response {label}:\n{result['response']}"
+            for label, result in zip(labels, stage1_results)
+        ])
+        mode_context = "question"
+        evaluation_criteria = """
+- Accuracy and correctness
+- Comprehensiveness and depth
+- Clarity of explanation
+- Practical usefulness"""
 
-    ranking_prompt = f"""You are evaluating different responses to the following question:
+    ranking_prompt = f"""You are evaluating different responses to the following {mode_context}:
 
 Question: {user_query}
 
@@ -89,7 +184,7 @@ Here are the responses from different models (anonymized):
 {responses_text}
 
 Your task:
-1. First, evaluate each response individually. For each response, explain what it does well and what it does poorly.
+1. First, evaluate each response individually based on:{evaluation_criteria}
 2. Then, at the very end of your response, provide a final ranking.
 
 IMPORTANT: Your final ranking MUST be formatted EXACTLY as follows:
@@ -114,7 +209,7 @@ Now provide your evaluation and ranking:"""
     messages = [{"role": "user", "content": ranking_prompt}]
 
     # Get rankings from all council models in parallel
-    responses = await query_models_parallel(COUNCIL_MODELS, messages)
+    responses = await query_models_parallel(council_models, messages)
 
     # Format results
     stage2_results = []
@@ -134,7 +229,9 @@ Now provide your evaluation and ranking:"""
 async def stage3_synthesize_final(
     user_query: str,
     stage1_results: List[Dict[str, Any]],
-    stage2_results: List[Dict[str, Any]]
+    stage2_results: List[Dict[str, Any]],
+    mode: str = "chat",
+    chairman_model: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Stage 3: Chairman synthesizes final response.
@@ -143,22 +240,73 @@ async def stage3_synthesize_final(
         user_query: The original user query
         stage1_results: Individual model responses from Stage 1
         stage2_results: Rankings from Stage 2
+        mode: Council mode - "chat", "code", or "image"
+        chairman_model: Optional specific chairman model to use
 
     Returns:
         Dict with 'model' and 'response' keys
     """
-    # Build comprehensive context for chairman
-    stage1_text = "\n\n".join([
-        f"Model: {result['model']}\nResponse: {result['response']}"
-        for result in stage1_results
-    ])
+    # Get the chairman model (custom or mode-specific)
+    chair = chairman_model if chairman_model else get_chairman_model(mode)
+    enable_image_generation = (mode == "image")
+
+    # Build comprehensive context for chairman (mode-specific)
+    if mode == "image":
+        stage1_text = "\n\n".join([
+            f"Model: {result['model']}\nDescription: {result['response']}" +
+            (f"\n[Generated {len(result.get('images', []))} image(s)]" if result.get('images') else "")
+            for result in stage1_results
+        ])
+    else:
+        stage1_text = "\n\n".join([
+            f"Model: {result['model']}\nResponse: {result['response']}"
+            for result in stage1_results
+        ])
 
     stage2_text = "\n\n".join([
         f"Model: {result['model']}\nRanking: {result['ranking']}"
         for result in stage2_results
     ])
 
-    chairman_prompt = f"""You are the Chairman of an LLM Council. Multiple AI models have provided responses to a user's question, and then ranked each other's responses.
+    # Mode-specific chairman prompts
+    if mode == "code":
+        chairman_prompt = f"""You are the Lead Architect of a Code Council. Multiple expert developers have provided solutions to a coding task, and then reviewed each other's code.
+
+Original Code Task: {user_query}
+
+STAGE 1 - Individual Solutions:
+{stage1_text}
+
+STAGE 2 - Peer Reviews:
+{stage2_text}
+
+Your task as Lead Architect is to synthesize all solutions into the BEST possible implementation. Consider:
+- Code correctness from all submissions
+- Best practices identified in reviews
+- Security and performance optimizations suggested
+- The consensus of peer rankings
+
+Provide the definitive solution with clean, well-documented code:"""
+    elif mode == "image":
+        chairman_prompt = f"""You are the Creative Director of an Image Council. Multiple AI artists have created interpretations of an image request, and then evaluated each other's work.
+
+Original Image Request: {user_query}
+
+STAGE 1 - Individual Creations:
+{stage1_text}
+
+STAGE 2 - Peer Evaluations:
+{stage2_text}
+
+Your task as Creative Director is to create the DEFINITIVE image that best represents the user's vision. Consider:
+- The most praised elements from each submission
+- The artistic insights from peer evaluations
+- The consensus on what works best
+- The original user intent
+
+Generate the final, best interpretation of the user's request:"""
+    else:
+        chairman_prompt = f"""You are the Chairman of an LLM Council. Multiple AI models have provided responses to a user's question, and then ranked each other's responses.
 
 Original Question: {user_query}
 
@@ -178,19 +326,29 @@ Provide a clear, well-reasoned final answer that represents the council's collec
     messages = [{"role": "user", "content": chairman_prompt}]
 
     # Query the chairman model
-    response = await query_model(CHAIRMAN_MODEL, messages)
+    response = await query_model(
+        chair,
+        messages,
+        enable_image_generation=enable_image_generation
+    )
 
     if response is None:
         # Fallback if chairman fails
         return {
-            "model": CHAIRMAN_MODEL,
+            "model": chair,
             "response": "Error: Unable to generate final synthesis."
         }
 
-    return {
-        "model": CHAIRMAN_MODEL,
+    result = {
+        "model": chair,
         "response": response.get('content', '')
     }
+
+    # Include images if generated (for image mode)
+    if response.get('images'):
+        result['images'] = response['images']
+
+    return result
 
 
 def parse_ranking_from_text(ranking_text: str) -> List[str]:
@@ -312,12 +470,20 @@ Title:"""
     return title
 
 
-async def run_full_council(user_query: str) -> Tuple[List, List, Dict, Dict]:
+async def run_full_council(
+    user_query: str,
+    mode: str = "chat",
+    custom_models: Optional[List[str]] = None,
+    chairman_model: Optional[str] = None
+) -> Tuple[List, List, Dict, Dict]:
     """
     Run the complete 3-stage council process.
 
     Args:
         user_query: The user's question
+        mode: Council mode - "chat", "code", or "image"
+        custom_models: Optional list of models to override defaults
+        chairman_model: Optional specific chairman model to use
 
     Returns:
         Tuple of (stage1_results, stage2_results, stage3_result, metadata)
@@ -326,7 +492,9 @@ async def run_full_council(user_query: str) -> Tuple[List, List, Dict, Dict]:
     search_context = await get_search_context(user_query)
 
     # Stage 1: Collect individual responses (with search context if available)
-    stage1_results = await stage1_collect_responses(user_query, search_context)
+    stage1_results = await stage1_collect_responses(
+        user_query, search_context, mode=mode, custom_models=custom_models
+    )
 
     # If no models responded successfully, return error
     if not stage1_results:
@@ -336,7 +504,9 @@ async def run_full_council(user_query: str) -> Tuple[List, List, Dict, Dict]:
         }, {}
 
     # Stage 2: Collect rankings
-    stage2_results, label_to_model = await stage2_collect_rankings(user_query, stage1_results)
+    stage2_results, label_to_model = await stage2_collect_rankings(
+        user_query, stage1_results, mode=mode, custom_models=custom_models
+    )
 
     # Calculate aggregate rankings
     aggregate_rankings = calculate_aggregate_rankings(stage2_results, label_to_model)
@@ -345,7 +515,9 @@ async def run_full_council(user_query: str) -> Tuple[List, List, Dict, Dict]:
     stage3_result = await stage3_synthesize_final(
         user_query,
         stage1_results,
-        stage2_results
+        stage2_results,
+        mode=mode,
+        chairman_model=chairman_model
     )
 
     # Prepare metadata
@@ -353,7 +525,10 @@ async def run_full_council(user_query: str) -> Tuple[List, List, Dict, Dict]:
         "label_to_model": label_to_model,
         "aggregate_rankings": aggregate_rankings,
         "web_search_used": search_context is not None,
-        "search_context": search_context
+        "search_context": search_context,
+        "mode": mode,
+        "council_models": custom_models if custom_models else get_council_models(mode),
+        "chairman_model": chairman_model if chairman_model else get_chairman_model(mode)
     }
 
     return stage1_results, stage2_results, stage3_result, metadata

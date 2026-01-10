@@ -48,8 +48,11 @@ export const api = {
 
   /**
    * Send a message in a conversation.
+   * @param {string} conversationId - The conversation ID
+   * @param {string} content - The message content
+   * @param {Object} options - Optional config: { mode, customModels, chairmanModel }
    */
-  async sendMessage(conversationId, content) {
+  async sendMessage(conversationId, content, options = {}) {
     const response = await fetch(
       `${API_BASE}/api/conversations/${conversationId}/message`,
       {
@@ -57,7 +60,12 @@ export const api = {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({
+          content,
+          mode: options.mode || 'chat',
+          custom_models: options.customModels || null,
+          chairman_model: options.chairmanModel || null,
+        }),
       }
     );
     if (!response.ok) {
@@ -71,9 +79,10 @@ export const api = {
    * @param {string} conversationId - The conversation ID
    * @param {string} content - The message content
    * @param {function} onEvent - Callback function for each event: (eventType, data) => void
+   * @param {Object} options - Optional config: { mode, customModels, chairmanModel }
    * @returns {Promise<void>}
    */
-  async sendMessageStream(conversationId, content, onEvent) {
+  async sendMessageStream(conversationId, content, onEvent, options = {}) {
     const response = await fetch(
       `${API_BASE}/api/conversations/${conversationId}/message/stream`,
       {
@@ -81,7 +90,12 @@ export const api = {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({
+          content,
+          mode: options.mode || 'chat',
+          custom_models: options.customModels || null,
+          chairman_model: options.chairmanModel || null,
+        }),
       }
     );
 
@@ -111,5 +125,42 @@ export const api = {
         }
       }
     }
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Model Management
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Get available models from OpenRouter.
+   */
+  async getAvailableModels() {
+    const response = await fetch(`${API_BASE}/api/models/available`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch available models');
+    }
+    return response.json();
+  },
+
+  /**
+   * Get council configuration for all modes.
+   */
+  async getCouncilConfig() {
+    const response = await fetch(`${API_BASE}/api/models/config`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch council config');
+    }
+    return response.json();
+  },
+
+  /**
+   * Get popular models for quick selection.
+   */
+  async getPopularModels() {
+    const response = await fetch(`${API_BASE}/api/models/popular`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch popular models');
+    }
+    return response.json();
   },
 };

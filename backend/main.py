@@ -5,13 +5,25 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import uuid
 import json
 import asyncio
+import httpx
 
 from . import storage
 from .council import run_full_council, generate_conversation_title, stage1_collect_responses, stage2_collect_rankings, stage3_synthesize_final, calculate_aggregate_rankings
+from .config import (
+    OPENROUTER_API_KEY,
+    get_council_models,
+    get_chairman_model,
+    CHAT_COUNCIL_MODELS,
+    CODE_COUNCIL_MODELS,
+    IMAGE_COUNCIL_MODELS,
+    CHAT_CHAIRMAN_MODEL,
+    CODE_CHAIRMAN_MODEL,
+    IMAGE_CHAIRMAN_MODEL,
+)
 
 app = FastAPI(title="LLM Council API")
 
@@ -39,6 +51,9 @@ class CreateConversationRequest(BaseModel):
 class SendMessageRequest(BaseModel):
     """Request to send a message in a conversation."""
     content: str
+    mode: Optional[str] = "chat"  # chat, code, or image
+    custom_models: Optional[List[str]] = None  # Override default models
+    chairman_model: Optional[str] = None  # Override chairman model
 
 
 class ConversationMetadata(BaseModel):
@@ -108,9 +123,12 @@ async def send_message(conversation_id: str, request: SendMessageRequest):
         title = await generate_conversation_title(request.content)
         storage.update_conversation_title(conversation_id, title)
 
-    # Run the 3-stage council process
+    # Run the 3-stage council process with mode and custom models
     stage1_results, stage2_results, stage3_result, metadata = await run_full_council(
-        request.content
+        request.content,
+        mode=request.mode or "chat",
+        custom_models=request.custom_models,
+        chairman_model=request.chairman_model
     )
 
     # Add assistant message with all stages
@@ -154,20 +172,32 @@ async def send_message_stream(conversation_id: str, request: SendMessageRequest)
             if is_first_message:
                 title_task = asyncio.create_task(generate_conversation_title(request.content))
 
+            # Get mode and custom models from request
+            mode = request.mode or "chat"
+            custom_models = request.custom_models
+            chairman = request.chairman_model
+
             # Stage 1: Collect responses
-            yield f"data: {json.dumps({'type': 'stage1_start'})}\n\n"
-            stage1_results = await stage1_collect_responses(request.content)
+            yield f"data: {json.dumps({'type': 'stage1_start', 'mode': mode})}\n\n"
+            stage1_results = await stage1_collect_responses(
+                request.content, mode=mode, custom_models=custom_models
+            )
             yield f"data: {json.dumps({'type': 'stage1_complete', 'data': stage1_results})}\n\n"
 
             # Stage 2: Collect rankings
             yield f"data: {json.dumps({'type': 'stage2_start'})}\n\n"
-            stage2_results, label_to_model = await stage2_collect_rankings(request.content, stage1_results)
+            stage2_results, label_to_model = await stage2_collect_rankings(
+                request.content, stage1_results, mode=mode, custom_models=custom_models
+            )
             aggregate_rankings = calculate_aggregate_rankings(stage2_results, label_to_model)
-            yield f"data: {json.dumps({'type': 'stage2_complete', 'data': stage2_results, 'metadata': {'label_to_model': label_to_model, 'aggregate_rankings': aggregate_rankings}})}\n\n"
+            yield f"data: {json.dumps({'type': 'stage2_complete', 'data': stage2_results, 'metadata': {'label_to_model': label_to_model, 'aggregate_rankings': aggregate_rankings, 'mode': mode}})}\n\n"
 
             # Stage 3: Synthesize final answer
             yield f"data: {json.dumps({'type': 'stage3_start'})}\n\n"
-            stage3_result = await stage3_synthesize_final(request.content, stage1_results, stage2_results)
+            stage3_result = await stage3_synthesize_final(
+                request.content, stage1_results, stage2_results,
+                mode=mode, chairman_model=chairman
+            )
             yield f"data: {json.dumps({'type': 'stage3_complete', 'data': stage3_result})}\n\n"
 
             # Wait for title generation if it was started
@@ -199,6 +229,110 @@ async def send_message_stream(conversation_id: str, request: SendMessageRequest)
             "Connection": "keep-alive",
         }
     )
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Model Management Endpoints
+# ═══════════════════════════════════════════════════════════════════════════
+
+@app.get("/api/models/available")
+async def list_available_models():
+    """
+    Fetch available models from OpenRouter API.
+    Returns a curated list of popular text generation models.
+    """
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://openrouter.ai/api/v1/models",
+                headers={"Authorization": f"Bearer {OPENROUTER_API_KEY}"},
+                timeout=30.0
+            )
+            response.raise_for_status()
+            data = response.json()
+
+            # Filter and format models
+            models = []
+            for model in data.get("data", []):
+                model_id = model.get("id", "")
+                # Filter out embedding, moderation, and deprecated models
+                if any(x in model_id.lower() for x in ["embed", "moderation", "deprecated"]):
+                    continue
+
+                models.append({
+                    "id": model_id,
+                    "name": model.get("name", model_id),
+                    "description": model.get("description", ""),
+                    "context_length": model.get("context_length", 0),
+                    "pricing": {
+                        "prompt": model.get("pricing", {}).get("prompt", 0),
+                        "completion": model.get("pricing", {}).get("completion", 0),
+                    },
+                    "top_provider": model.get("top_provider", {}).get("max_completion_tokens", 0),
+                })
+
+            # Sort by name
+            models.sort(key=lambda x: x["name"].lower())
+
+            return {"models": models, "count": len(models)}
+
+    except httpx.HTTPError as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch models: {str(e)}")
+
+
+@app.get("/api/models/config")
+async def get_council_config():
+    """
+    Get the current council configuration for all modes.
+    """
+    return {
+        "modes": {
+            "chat": {
+                "name": "Chat",
+                "description": "General purpose conversation",
+                "council_models": CHAT_COUNCIL_MODELS,
+                "chairman_model": CHAT_CHAIRMAN_MODEL,
+                "icon": "chat"
+            },
+            "code": {
+                "name": "Code",
+                "description": "Programming and development",
+                "council_models": CODE_COUNCIL_MODELS,
+                "chairman_model": CODE_CHAIRMAN_MODEL,
+                "icon": "code"
+            },
+            "image": {
+                "name": "Image",
+                "description": "Image generation and analysis",
+                "council_models": IMAGE_COUNCIL_MODELS,
+                "chairman_model": IMAGE_CHAIRMAN_MODEL,
+                "icon": "image"
+            }
+        },
+        "default_mode": "chat"
+    }
+
+
+@app.get("/api/models/popular")
+async def get_popular_models():
+    """
+    Get a curated list of popular models for quick selection.
+    """
+    return {
+        "popular": [
+            {"id": "openai/gpt-5.1", "name": "GPT-5.1", "provider": "OpenAI"},
+            {"id": "openai/gpt-4o", "name": "GPT-4o", "provider": "OpenAI"},
+            {"id": "anthropic/claude-sonnet-4.5", "name": "Claude Sonnet 4.5", "provider": "Anthropic"},
+            {"id": "anthropic/claude-opus-4.5", "name": "Claude Opus 4.5", "provider": "Anthropic"},
+            {"id": "google/gemini-3-pro-preview", "name": "Gemini 3 Pro", "provider": "Google"},
+            {"id": "google/gemini-2.5-flash-preview", "name": "Gemini 2.5 Flash", "provider": "Google"},
+            {"id": "x-ai/grok-4", "name": "Grok 4", "provider": "xAI"},
+            {"id": "meta-llama/llama-4-maverick", "name": "Llama 4 Maverick", "provider": "Meta"},
+            {"id": "deepseek/deepseek-r1", "name": "DeepSeek R1", "provider": "DeepSeek"},
+            {"id": "qwen/qwen3-coder", "name": "Qwen3 Coder", "provider": "Alibaba"},
+            {"id": "mistralai/mistral-large-2411", "name": "Mistral Large", "provider": "Mistral"},
+        ]
+    }
 
 
 if __name__ == "__main__":

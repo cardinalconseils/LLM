@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatInterface from './components/ChatInterface';
 import { api } from './api';
@@ -10,6 +10,10 @@ function App() {
   const [currentConversation, setCurrentConversation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [councilMode, setCouncilMode] = useState('chat'); // 'chat', 'code', or 'image'
+  const [customModels, setCustomModels] = useState(null); // null = use defaults, array = custom selection
+  const [chairmanModel, setChairmanModel] = useState(null); // null = use mode's default
+  const abortControllerRef = useRef(null);
 
   // Load conversations on mount
   useEffect(() => {
@@ -90,7 +94,7 @@ function App() {
         messages: [...prev.messages, assistantMessage],
       }));
 
-      // Send message with streaming
+      // Send message with streaming (pass the council mode as options)
       await api.sendMessageStream(currentConversationId, content, (eventType, event) => {
         switch (eventType) {
           case 'stage1_start':
@@ -170,7 +174,7 @@ function App() {
           default:
             console.log('Unknown event type:', eventType);
         }
-      });
+      }, { mode: councilMode, customModels, chairmanModel });
     } catch (error) {
       console.error('Failed to send message:', error);
       // Remove optimistic messages on error
@@ -185,6 +189,14 @@ function App() {
   const handleSelectConversationMobile = (id) => {
     handleSelectConversation(id);
     setSidebarOpen(false);
+  };
+
+  const handleStopGeneration = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -225,7 +237,14 @@ function App() {
       <ChatInterface
         conversation={currentConversation}
         onSendMessage={handleSendMessage}
+        onStopGeneration={handleStopGeneration}
         isLoading={isLoading}
+        mode={councilMode}
+        onModeChange={setCouncilMode}
+        customModels={customModels}
+        onModelsChange={setCustomModels}
+        chairmanModel={chairmanModel}
+        onChairmanChange={setChairmanModel}
       />
     </div>
   );
