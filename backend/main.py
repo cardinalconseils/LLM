@@ -25,7 +25,7 @@ from .config import (
     IMAGE_CHAIRMAN_MODEL,
 )
 
-app = FastAPI(title="LLM Council API")
+app = FastAPI(title="LLM Council API", version="0.2.0")
 
 # CORS configuration - extend with FRONTEND_URL for production
 allowed_origins = ["http://localhost:5173", "http://localhost:3000"]
