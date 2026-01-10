@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_description": "MCP server configuration for LLM Council project",
+
+  "mcpServers": {
+    "council-data": {
+      "_comment": "Custom MCP server for accessing council conversation data",
+      "command": "python",
+      "args": ["-m", "mcp_servers.council_data"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "DATA_DIR": "data/conversations"
+      },
+      "disabled": true,
+      "_note": "Enable when mcp_servers/council_data.py is implemented"
+    },
+
+    "openrouter-models": {
+      "_comment": "MCP server for querying available OpenRouter models",
+      "command": "python",
+      "args": ["-m", "mcp_servers.openrouter_models"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "OPENROUTER_API_KEY": "${env:OPENROUTER_API_KEY}"
+      },
+      "disabled": true,
+      "_note": "Enable when mcp_servers/openrouter_models.py is implemented"
+    }
+  },
+
+  "_future_servers": {
+    "_note": "These are placeholder configurations for potential future MCP servers",
+
+    "analytics": {
+      "description": "Server for council performance analytics and metrics",
+      "features": ["response_times", "model_rankings", "cost_tracking"]
+    },
+
+    "model-benchmark": {
+      "description": "Server for running model benchmarks and comparisons",
+      "features": ["accuracy_tests", "speed_tests", "cost_comparison"]
+    }
+  }
+}

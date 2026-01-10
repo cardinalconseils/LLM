@@ -1,0 +1,154 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Mode Toggle - Claude Desktop Style
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.mode-toggle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.mode-toggle {
+  position: relative;
+  display: flex;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  gap: 2px;
+}
+
+.mode-toggle-btn {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  min-width: 100px;
+}
+
+.mode-toggle-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+.mode-toggle-btn.active {
+  color: var(--text-primary);
+}
+
+.mode-toggle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mode-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+
+.mode-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.mode-label {
+  font-weight: 600;
+}
+
+/* Animated indicator background */
+.mode-toggle-indicator {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(33.333% - 2px);
+  height: calc(100% - 8px);
+  background: var(--gradient-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-glow);
+  transition: transform var(--transition-base);
+  z-index: 0;
+}
+
+.mode-description {
+  margin-top: var(--space-sm);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Mode-specific accent colors
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Chat mode - default blue */
+.mode-toggle-container[data-mode="chat"] .mode-toggle-indicator {
+  background: var(--gradient-primary);
+}
+
+/* Code mode - green */
+.mode-toggle-container[data-mode="code"] .mode-toggle-indicator {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+
+/* Image mode - purple */
+.mode-toggle-container[data-mode="image"] .mode-toggle-indicator {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Responsive Design
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .mode-toggle-container {
+    padding: var(--space-sm) var(--space-md);
+    padding-top: calc(var(--space-sm) + 50px); /* Account for mobile menu button */
+  }
+
+  .mode-toggle-btn {
+    padding: var(--space-xs) var(--space-md);
+    min-width: 80px;
+  }
+
+  .mode-label {
+    font-size: 0.8125rem;
+  }
+
+  .mode-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mode-toggle-btn {
+    padding: var(--space-xs) var(--space-sm);
+    min-width: 60px;
+  }
+
+  .mode-label {
+    display: none;
+  }
+
+  .mode-toggle-indicator {
+    width: calc(33.333% - 4px);
+  }
+}

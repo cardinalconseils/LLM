@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_description": "Claude Code project settings for LLM Council",
+
+  "model": "sonnet",
+
+  "contextPaths": [
+    "CLAUDE.md",
+    "backend/config.py"
+  ],
+
+  "codeStyle": {
+    "python": {
+      "docstrings": "google",
+      "maxLineLength": 100,
+      "imports": "relative"
+    },
+    "javascript": {
+      "jsx": true,
+      "semicolons": true,
+      "quotes": "single"
+    }
+  },
+
+  "preferredTools": {
+    "backend": "python",
+    "frontend": "vite",
+    "testing": "pytest"
+  },
+
+  "projectPatterns": {
+    "backendPort": 8001,
+    "frontendPort": 5173,
+    "dataDirectory": "data/conversations"
+  }
+}

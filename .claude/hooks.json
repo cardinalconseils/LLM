@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_description": "Claude Code hooks for LLM Council project",
+
+  "hooks": {
+    "PreEdit": [
+      {
+        "name": "validate-python-imports",
+        "description": "Ensure backend Python files use relative imports",
+        "matcher": {
+          "pathPattern": "backend/**/*.py"
+        },
+        "command": "echo 'Remember: Use relative imports (from .module import X) in backend files'"
+      }
+    ],
+
+    "PostEdit": [
+      {
+        "name": "check-config-changes",
+        "description": "Warn when council configuration is modified",
+        "matcher": {
+          "pathPattern": "backend/config.py"
+        },
+        "command": "echo 'Config modified - backend restart required for changes to take effect'"
+      }
+    ],
+
+    "PreCommit": [
+      {
+        "name": "check-env-file",
+        "description": "Prevent committing .env files",
+        "command": "git diff --cached --name-only | grep -q '\\.env' && echo 'ERROR: Do not commit .env files!' && exit 1 || exit 0"
+      },
+      {
+        "name": "check-api-keys",
+        "description": "Prevent committing API keys",
+        "command": "git diff --cached | grep -iE '(api.?key|secret|password|token).*=.*[a-zA-Z0-9]{20,}' && echo 'ERROR: Possible API key detected!' && exit 1 || exit 0"
+      }
+    ],
+
+    "PostToolUse": [
+      {
+        "name": "backend-restart-reminder",
+        "description": "Remind to restart backend after Python changes",
+        "matcher": {
+          "toolName": "Edit",
+          "pathPattern": "backend/**/*.py"
+        },
+        "command": "echo 'Python file modified - restart backend if running: python -m backend.main'"
+      }
+    ]
+  }
+}
