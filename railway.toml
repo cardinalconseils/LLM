@@ -1,10 +1,13 @@
 [build]
 builder = "nixpacks"
 
+[build.env]
+BUILD_VERSION = "0.2.0"
+
 [deploy]
 startCommand = "python run_backend.py"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
-# Railway deployment trigger: Sat Jan 10 12:31:18 EST 2026
+# Railway deployment trigger: v0.2.0 multi-mode council
