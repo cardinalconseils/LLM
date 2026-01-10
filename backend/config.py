@@ -43,7 +43,7 @@ IMAGE_COUNCIL_MODELS = [
     "google/gemini-2.5-flash-image",         # Nano Banana - Gemini 2.5 Flash Image
     "qwen/qwen-vl-max",                      # Qwen VL for vision/image tasks
 ]
-IMAGE_CHAIRMAN_MODEL = "google/gemini-3-pro-image-preview"  # Nano Banana Pro as chairman
+IMAGE_CHAIRMAN_MODEL = "google/gemini-3-pro-image-preview"  # Nano Banana Pro - Creative Director
 
 # Image generation specific settings
 IMAGE_GENERATION_CONFIG = {
