@@ -18,7 +18,9 @@ app = FastAPI(title="LLM Council API")
 # CORS configuration - extend with FRONTEND_URL for production
 allowed_origins = ["http://localhost:5173", "http://localhost:3000"]
 if os.environ.get("FRONTEND_URL"):
-    allowed_origins.append(os.environ["FRONTEND_URL"])
+    # Support comma-separated list of URLs
+    urls = os.environ["FRONTEND_URL"].split(",")
+    allowed_origins.extend([url.strip() for url in urls])
 
 app.add_middleware(
     CORSMiddleware,
