@@ -1,5 +1,6 @@
 """FastAPI backend for LLM Council."""
 
+import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -14,10 +15,14 @@ from .council import run_full_council, generate_conversation_title, stage1_colle
 
 app = FastAPI(title="LLM Council API")
 
-# Enable CORS for local development
+# CORS configuration - extend with FRONTEND_URL for production
+allowed_origins = ["http://localhost:5173", "http://localhost:3000"]
+if os.environ.get("FRONTEND_URL"):
+    allowed_origins.append(os.environ["FRONTEND_URL"])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
