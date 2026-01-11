@@ -119,10 +119,6 @@
   --shadow-glow: 0 0 0 4px rgba(52, 73, 94, 0.08);
   --shadow-glow-strong: 0 0 0 6px rgba(52, 73, 94, 0.12);
 
-  /* Gradients - Classic subtle style */
-  --gradient-primary: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
-  --gradient-success: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-
   /* Spacing */
   --space-xs: 4px;
   --space-sm: 8px;
