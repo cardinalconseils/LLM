@@ -1,10 +1,57 @@
-# CLAUDE.md - Technical Notes for LLM Council
+# CLAUDE.md
 
-This file contains technical details, architectural decisions, and important implementation notes for future development sessions.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
 LLM Council is a 3-stage deliberation system where multiple LLMs collaboratively answer user questions. The key innovation is anonymized peer review in Stage 2, preventing models from playing favorites.
+
+## Development Commands
+
+### Setup
+**Backend:**
+```bash
+uv sync
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm install
+cd ..
+```
+
+**Environment:**
+Create `.env` file in project root:
+```bash
+OPENROUTER_API_KEY=sk-or-v1-...
+TAVILY_API_KEY=tvly-...  # Optional for web search
+```
+
+### Running Locally
+**Option 1: Use start script**
+```bash
+./start.sh
+```
+
+**Option 2: Manual (two terminals)**
+```bash
+# Terminal 1 - Backend
+uv run python -m backend.main
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev
+```
+
+Then open http://localhost:5173
+
+### Building Frontend
+```bash
+cd frontend
+npm run build    # Builds to dist/
+npm run preview  # Preview production build locally
+```
 
 ## Multi-Mode Council System
 
@@ -85,7 +132,10 @@ The LLM Council supports three specialized modes, each with its own council of e
 - FastAPI app with CORS enabled for localhost:5173 and localhost:3000
 - POST `/api/conversations/{id}/message` - Send message with optional mode
   - Request body: `{content, mode, custom_models, chairman_model}`
-- POST `/api/conversations/{id}/message/stream` - SSE streaming with mode support
+- POST `/api/conversations/{id}/message/stream` - **SSE streaming endpoint (primary method)**
+  - Returns Server-Sent Events as each stage completes
+  - Frontend uses this by default for progressive UI updates
+  - Events: `stage1_start`, `stage1_complete`, `stage2_start`, `stage2_complete`, `stage3_start`, `stage3_complete`, `title_complete`, `complete`, `error`
 - GET `/api/models/config` - Returns mode-specific council configurations
 - GET `/api/models/available` - Lists all available OpenRouter models
 - GET `/api/models/popular` - Curated list of popular models
@@ -95,7 +145,10 @@ The LLM Council supports three specialized modes, each with its own council of e
 **`App.jsx`**
 - Main orchestration: manages conversations list and current conversation
 - State: `councilMode`, `customModels`, `chairmanModel` for mode configuration
-- Handles message sending with mode options
+- **Streaming Support**: Uses `api.sendMessageStream()` for progressive UI updates
+  - Optimistically adds user message to UI
+  - Updates assistant message as each stage completes
+  - Handles loading states per stage (`loading.stage1`, `loading.stage2`, `loading.stage3`)
 - Important: metadata is stored in the UI state for display but not persisted to backend JSON
 
 **`components/ModeToggle.jsx`** - Claude Desktop Style Toggle
@@ -175,7 +228,8 @@ All backend modules use relative imports (e.g., `from .config import ...`) not a
 ### Port Configuration
 - Backend: 8001 (changed from 8000 to avoid conflict)
 - Frontend: 5173 (Vite default)
-- Update both `backend/main.py` and `frontend/src/api.js` if changing
+- Frontend API URL is configured via `VITE_API_URL` env var (defaults to `http://localhost:8001`)
+- Update `backend/main.py` CORS middleware if changing frontend URL
 
 ### Markdown Rendering
 All ReactMarkdown components must be wrapped in `<div className="markdown-content">` for proper spacing. This class is defined globally in `index.css`.
