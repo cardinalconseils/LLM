@@ -1,12 +1,17 @@
-import { useState, useEffect, useRef } from 'react'
-import { Menu, X } from 'lucide-react'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import { Menu, X, LogOut } from 'lucide-react'
 import Sidebar from './components/Sidebar'
 import ChatInterface from './components/ChatInterface'
+import RightPanel from './components/RightPanel'
+import Login from './components/Login'
 import { Button } from './components/ui/button'
 import { api } from './api'
 import { cn } from './lib/utils'
+import { useAuth } from './contexts/AuthContext'
 
 function App() {
+  const { user, loading: authLoading, signOut } = useAuth()
+
   const [conversations, setConversations] = useState([])
   const [currentConversationId, setCurrentConversationId] = useState(null)
   const [currentConversation, setCurrentConversation] = useState(null)
@@ -197,6 +202,33 @@ function App() {
     }
   }
 
+  // Get the latest assistant message data for the right panel
+  const latestAssistantData = useMemo(() => {
+    if (!currentConversation?.messages) return null
+    const assistantMessages = currentConversation.messages.filter(m => m.role === 'assistant')
+    const latest = assistantMessages[assistantMessages.length - 1]
+    if (!latest) return null
+    return {
+      aggregateRankings: latest.metadata?.aggregate_rankings,
+      labelToModel: latest.metadata?.label_to_model,
+      stage1Responses: latest.stage1,
+    }
+  }, [currentConversation?.messages])
+
+  // Show loading state while checking auth
+  if (authLoading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-background-secondary">
+        <div className="animate-pulse text-slate-500">Loading...</div>
+      </div>
+    )
+  }
+
+  // Show login if not authenticated
+  if (!user) {
+    return <Login />
+  }
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background-secondary">
       {/* Mobile Menu Toggle */}
@@ -211,6 +243,21 @@ function App() {
         )}
       >
         {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </Button>
+
+      {/* Logout Button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={signOut}
+        aria-label="Sign out"
+        title={`Signed in as ${user?.email || user?.phone}`}
+        className={cn(
+          'fixed top-4 right-4 z-50',
+          'bg-white/80 backdrop-blur-sm shadow-md hover:bg-white hover:text-red-600'
+        )}
+      >
+        <LogOut className="w-4 h-4" />
       </Button>
 
       {/* Mobile Overlay */}
@@ -243,6 +290,18 @@ function App() {
         chairmanModel={chairmanModel}
         onChairmanChange={setChairmanModel}
       />
+
+      {/* Right Panel - Council Analytics */}
+      {currentConversation && (
+        <div className="hidden lg:flex h-full">
+          <RightPanel
+            aggregateRankings={latestAssistantData?.aggregateRankings}
+            labelToModel={latestAssistantData?.labelToModel}
+            stage1Responses={latestAssistantData?.stage1Responses}
+            isVisible={true}
+          />
+        </div>
+      )}
     </div>
   )
 }

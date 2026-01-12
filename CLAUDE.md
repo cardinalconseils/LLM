@@ -26,6 +26,10 @@ Create `.env` file in project root:
 ```bash
 OPENROUTER_API_KEY=sk-or-v1-...
 TAVILY_API_KEY=tvly-...  # Optional for web search
+
+# Supabase Authentication (required)
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ### Running Locally
@@ -81,6 +85,40 @@ The LLM Council supports three specialized modes, each with its own council of e
 - Claude Desktop-like toggle at top of chat interface
 - API supports `mode` parameter in request body
 - Each mode has optimized prompts for its domain
+
+## Authentication
+
+The application uses Supabase for authentication with the following characteristics:
+
+### Login Only (No Signup)
+- Users cannot self-register; only administrators can create accounts in Supabase dashboard
+- Supports both **email** and **phone** login via OTP (One-Time Password)
+- The `shouldCreateUser: false` option ensures only pre-existing users can log in
+
+### Authentication Flow
+1. User selects email or phone login method
+2. Supabase sends OTP to the provided email/phone
+3. User enters the 6-digit verification code
+4. On successful verification, user is authenticated and can access the app
+
+### Key Files
+- `frontend/src/lib/supabase.js` - Supabase client configuration
+- `frontend/src/contexts/AuthContext.jsx` - Auth state management and methods
+- `frontend/src/components/Login.jsx` - Login UI component
+- `frontend/src/App.jsx` - Auth guard that protects the main app
+
+### Creating Users
+Users must be created manually in Supabase:
+1. Go to Supabase Dashboard > Authentication > Users
+2. Click "Add user" > "Create new user"
+3. Enter email or phone number
+4. The user can now log in via OTP
+
+### Environment Variables
+```bash
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your_anon_key_here
+```
 
 ## Architecture
 
@@ -255,6 +293,8 @@ Models are hardcoded in `backend/config.py`. Chairman can be same or different f
 
 **Frontend service:**
 - `VITE_API_URL` - Backend API URL (e.g., `https://backend-production-xxx.up.railway.app`)
+- `VITE_SUPABASE_URL` - Supabase project URL (e.g., `https://your-project-id.supabase.co`)
+- `VITE_SUPABASE_ANON_KEY` - Supabase anonymous/public key
 - `NIXPACKS_NODE_VERSION` - Set to `22` for Vite 7 and @vitejs/plugin-react@5.x compatibility
 
 ### Railway Configuration

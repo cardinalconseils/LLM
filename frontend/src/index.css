@@ -1,137 +1,168 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LLM COUNCIL - Classic Professional Design System
-   Timeless, elegant, neutral color palette
+   LLM COUNCIL - Premium Council Chamber Design System
+   Inspired by Steve Jobs & Jony Ive's design philosophy
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* Tailwind v4 Theme Configuration */
 @theme {
-  /* Classic Neutral Color Palette */
-  --color-background: #ffffff;
-  --color-background-secondary: #f8f9fa;
-  --color-background-tertiary: #e9ecef;
+  /* Premium Council Color Palette */
+  --color-background: #fdfbf7;
+  --color-background-secondary: #f5f3ed;
+  --color-background-tertiary: #eae7df;
   --color-background-elevated: #ffffff;
 
-  /* Text Colors */
-  --color-foreground: #2c3e50;
-  --color-foreground-secondary: #555555;
-  --color-foreground-tertiary: #6c757d;
-  --color-foreground-muted: #95a5a6;
+  /* Council Chamber Colors */
+  --color-council-indigo: #2d3561;
+  --color-council-indigo-light: #3d4676;
+  --color-council-indigo-dark: #1f2543;
+  --color-council-gold: #d4a574;
+  --color-council-gold-light: #e6c299;
+  --color-council-gold-dark: #b8884d;
+  --color-council-cream: #fdfbf7;
+  --color-council-parchment: #f5f3ed;
 
-  /* Classic Slate Accent */
-  --color-primary: #34495e;
-  --color-primary-hover: #2c3e50;
-  --color-primary-active: #1a252f;
+  /* Text Colors */
+  --color-foreground: #1a1d2e;
+  --color-foreground-secondary: #4a4d5e;
+  --color-foreground-tertiary: #6b6e7e;
+  --color-foreground-muted: #9b9dad;
+
+  /* Primary - Deep Indigo */
+  --color-primary: #2d3561;
+  --color-primary-hover: #3d4676;
+  --color-primary-active: #1f2543;
   --color-primary-foreground: #ffffff;
 
+  /* Accent - Warm Gold */
+  --color-accent: #d4a574;
+  --color-accent-hover: #e6c299;
+  --color-accent-active: #b8884d;
+  --color-accent-foreground: #1a1d2e;
+
   /* Semantic Colors */
-  --color-success: #27ae60;
-  --color-success-bg: #f8faf9;
-  --color-warning: #e67e22;
-  --color-warning-bg: #fdf8f3;
-  --color-error: #c0392b;
-  --color-error-bg: #fdf5f4;
-  --color-info: #5a6c7d;
-  --color-info-bg: #f5f6f7;
+  --color-success: #4a9d6f;
+  --color-success-bg: #f0f9f4;
+  --color-warning: #d4894f;
+  --color-warning-bg: #fdf6f0;
+  --color-error: #c74b4b;
+  --color-error-bg: #fdf2f2;
+  --color-info: #5a7ba0;
+  --color-info-bg: #f3f6fa;
 
   /* Border & Separator */
-  --color-border: #d1d5db;
-  --color-border-light: #e5e7eb;
-  --color-separator: #bdc3c7;
+  --color-border: #d5d1c7;
+  --color-border-light: #e8e5dd;
+  --color-separator: #c9c4b8;
 
-  /* Shadows - Apple's subtle depth */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.06), 0 4px 10px rgba(0, 0, 0, 0.04);
-  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.04);
+  /* Premium Shadows - Soft and Sophisticated */
+  --shadow-xs: 0 1px 2px rgba(29, 33, 45, 0.03);
+  --shadow-sm: 0 2px 4px rgba(29, 33, 45, 0.04), 0 1px 2px rgba(29, 33, 45, 0.02);
+  --shadow-md: 0 4px 8px rgba(29, 33, 45, 0.06), 0 2px 4px rgba(29, 33, 45, 0.03);
+  --shadow-lg: 0 8px 24px rgba(29, 33, 45, 0.08), 0 4px 8px rgba(29, 33, 45, 0.04);
+  --shadow-xl: 0 16px 48px rgba(29, 33, 45, 0.10), 0 8px 16px rgba(29, 33, 45, 0.05);
+  --shadow-glow: 0 0 0 3px rgba(212, 165, 116, 0.12);
+  --shadow-glow-indigo: 0 0 0 3px rgba(45, 53, 97, 0.08);
 
-  /* Border Radius - Apple's rounded aesthetic */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-  --radius-2xl: 28px;
+  /* Border Radius - Refined Curves */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
   --radius-full: 9999px;
 
-  /* Spacing */
+  /* Spacing - Generous Breathing Room */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
   --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+  --spacing-4xl: 96px;
 
-  /* Typography - Apple SF Pro */
+  /* Typography - San Francisco Pro */
   --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  --font-serif: 'Merriweather', 'Georgia', 'Times New Roman', serif;
   --font-mono: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
 
-  /* Transitions */
-  --transition-fast: 120ms cubic-bezier(0.25, 0.1, 0.25, 1);
-  --transition-base: 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
-  --transition-slow: 300ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  /* Transitions - Apple's signature ease */
+  --transition-fast: 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-base: 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-slow: 400ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Legacy Variable Mappings (for component CSS compatibility)
    ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Background Colors */
+  /* Background Colors - Premium Council Palette */
   --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --bg-tertiary: #e9ecef;
+  --bg-secondary: #f5f3ed;
+  --bg-tertiary: #eae7df;
+  --bg-cream: #fdfbf7;
 
-  /* Text Colors */
-  --text-primary: #2c3e50;
-  --text-secondary: #555555;
-  --text-tertiary: #6c757d;
-  --text-muted: #95a5a6;
+  /* Text Colors - Rich and Sophisticated */
+  --text-primary: #1a1d2e;
+  --text-secondary: #4a4d5e;
+  --text-tertiary: #6b6e7e;
+  --text-muted: #9b9dad;
 
-  /* Classic Slate Accent */
-  --accent-primary: #34495e;
-  --accent-hover: #2c3e50;
-  --accent-subtle: rgba(52, 73, 94, 0.08);
-  --accent-glow: rgba(52, 73, 94, 0.12);
+  /* Council Indigo Accent */
+  --accent-primary: #2d3561;
+  --accent-hover: #3d4676;
+  --accent-subtle: rgba(45, 53, 97, 0.06);
+  --accent-glow: rgba(45, 53, 97, 0.10);
 
-  /* Glass Effect (Professional frosted glass) */
-  --glass-bg: rgba(255, 255, 255, 0.75);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --glass-hover: rgba(0, 0, 0, 0.04);
+  /* Gold Accent - Prestige */
+  --gold-primary: #d4a574;
+  --gold-hover: #e6c299;
+  --gold-subtle: rgba(212, 165, 116, 0.08);
+  --gold-glow: rgba(212, 165, 116, 0.15);
+
+  /* Glass Effect (Refined Frosted Glass) */
+  --glass-bg: rgba(253, 251, 247, 0.85);
+  --glass-border: rgba(45, 53, 97, 0.08);
+  --glass-hover: rgba(45, 53, 97, 0.04);
 
   /* Semantic Colors */
-  --success-primary: #27ae60;
-  --success-bg: rgba(39, 174, 96, 0.06);
-  --success-border: rgba(39, 174, 96, 0.2);
-  --warning-primary: #e67e22;
-  --warning-bg: rgba(230, 126, 34, 0.06);
-  --warning-border: rgba(230, 126, 34, 0.2);
-  --error-primary: #c0392b;
-  --error-bg: rgba(192, 57, 43, 0.06);
-  --error-border: rgba(192, 57, 43, 0.2);
+  --success-primary: #4a9d6f;
+  --success-bg: rgba(74, 157, 111, 0.06);
+  --success-border: rgba(74, 157, 111, 0.2);
+  --warning-primary: #d4894f;
+  --warning-bg: rgba(212, 137, 79, 0.06);
+  --warning-border: rgba(212, 137, 79, 0.2);
+  --error-primary: #c74b4b;
+  --error-bg: rgba(199, 75, 75, 0.06);
+  --error-border: rgba(199, 75, 75, 0.2);
 
-  /* Shadows - Professional depth */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.10), 0 4px 8px rgba(0, 0, 0, 0.06);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 0 0 4px rgba(52, 73, 94, 0.08);
-  --shadow-glow-strong: 0 0 0 6px rgba(52, 73, 94, 0.12);
+  /* Premium Shadows - Soft Depth */
+  --shadow-xs: 0 1px 2px rgba(29, 33, 45, 0.03);
+  --shadow-sm: 0 2px 4px rgba(29, 33, 45, 0.04), 0 1px 2px rgba(29, 33, 45, 0.02);
+  --shadow-md: 0 4px 8px rgba(29, 33, 45, 0.06), 0 2px 4px rgba(29, 33, 45, 0.03);
+  --shadow-lg: 0 8px 24px rgba(29, 33, 45, 0.08), 0 4px 8px rgba(29, 33, 45, 0.04);
+  --shadow-xl: 0 16px 48px rgba(29, 33, 45, 0.10), 0 8px 16px rgba(29, 33, 45, 0.05);
+  --shadow-glow: 0 0 0 3px rgba(212, 165, 116, 0.12);
+  --shadow-glow-indigo: 0 0 0 3px rgba(45, 53, 97, 0.08);
 
-  /* Spacing */
+  /* Spacing - Generous */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
   --space-lg: 24px;
   --space-xl: 32px;
   --space-2xl: 48px;
+  --space-3xl: 64px;
 
-  /* Border Radius - Apple's rounded aesthetic */
+  /* Border Radius - Refined Curves */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-xl: 22px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
   --radius-full: 9999px;
 
   /* Z-index layers */
@@ -141,11 +172,11 @@
   --z-overlay: 200;
   --z-modal: 300;
 
-  /* Transitions */
-  --transition-fast: 120ms ease-out;
-  --transition-base: 200ms ease-out;
-  --transition-slow: 300ms ease-out;
-  --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Transitions - Apple Signature */
+  --transition-fast: 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-base: 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-slow: 400ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -373,7 +404,7 @@ body {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Animations
+   Premium Animations - Delightful Micro-interactions
    ───────────────────────────────────────────────────────────────────────────── */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -383,7 +414,7 @@ body {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -394,7 +425,7 @@ body {
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.97);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
@@ -404,7 +435,18 @@ body {
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
 }
 
 @keyframes spin {
@@ -413,17 +455,69 @@ body {
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  50% { transform: translateY(-6px); }
 }
 
 @keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateX(-8px);
+    transform: translateX(-12px);
   }
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Council-specific animations */
+@keyframes councilGather {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes deliberate {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.9;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(212, 165, 116, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(212, 165, 116, 0);
   }
 }
 
@@ -442,6 +536,28 @@ body {
 
 .animate-pulse {
   animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s ease-in-out infinite;
+}
+
+.animate-council-gather {
+  animation: councilGather var(--transition-slow) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.1), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────

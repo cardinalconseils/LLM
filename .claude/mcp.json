@@ -3,6 +3,12 @@
   "_description": "MCP server configuration for LLM Council project",
 
   "mcpServers": {
+    "supabase": {
+      "_comment": "Supabase MCP for database, auth, and storage operations",
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp"
+    },
+
     "council-data": {
       "_comment": "Custom MCP server for accessing council conversation data",
       "command": "python",
