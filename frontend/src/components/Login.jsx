@@ -74,11 +74,7 @@ export default function Login() {
         const normalizedPhone = normalizePhone(phone)
         const { error } = await signInWithPhone(normalizedPhone)
         if (error) {
-          if (error.message.includes('Signups not allowed')) {
-            setError('This phone number is not registered. Contact an administrator.')
-          } else {
-            setError(error.message)
-          }
+          setError(`Failed to send verification code: ${error.message}`)
         } else {
           setMessage('Check your phone for the verification code')
           setStep('verify')
@@ -107,7 +103,13 @@ export default function Login() {
         const normalizedPhone = normalizePhone(phone)
         const { error } = await verifyPhoneOtp(normalizedPhone, otp)
         if (error) {
-          setError(error.message)
+          if (error.message.includes('Invalid token') || error.message.includes('expired')) {
+            setError('Invalid or expired code. Please try again.')
+          } else if (error.message.includes('not found')) {
+            setError('This phone number is not registered. Contact an administrator.')
+          } else {
+            setError(error.message)
+          }
         }
       }
     } catch (err) {
