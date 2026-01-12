@@ -26,6 +26,30 @@ export default function Login() {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
 
+  // Normalize phone number to E.164 format (e.g., +14388018302)
+  const normalizePhone = (phoneInput) => {
+    // Remove all non-digit characters except leading +
+    const cleaned = phoneInput.replace(/[^\d+]/g, '')
+
+    // If it starts with +, use as-is
+    if (cleaned.startsWith('+')) {
+      return cleaned
+    }
+
+    // If it starts with 1 and has 11 digits, add +
+    if (cleaned.startsWith('1') && cleaned.length === 11) {
+      return '+' + cleaned
+    }
+
+    // If it has 10 digits, assume US/Canada and add +1
+    if (cleaned.length === 10) {
+      return '+1' + cleaned
+    }
+
+    // Otherwise return cleaned version
+    return cleaned.startsWith('+') ? cleaned : '+' + cleaned
+  }
+
   const handleSendOtp = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -46,7 +70,9 @@ export default function Login() {
           setStep('verify')
         }
       } else if (mode === 'phone') {
-        const { error } = await signInWithPhone(phone)
+        // Normalize phone number before sending
+        const normalizedPhone = normalizePhone(phone)
+        const { error } = await signInWithPhone(normalizedPhone)
         if (error) {
           if (error.message.includes('Signups not allowed')) {
             setError('This phone number is not registered. Contact an administrator.')
@@ -77,7 +103,9 @@ export default function Login() {
           setError(error.message)
         }
       } else if (mode === 'phone') {
-        const { error } = await verifyPhoneOtp(phone, otp)
+        // Normalize phone number before verifying
+        const normalizedPhone = normalizePhone(phone)
+        const { error } = await verifyPhoneOtp(normalizedPhone, otp)
         if (error) {
           setError(error.message)
         }
@@ -508,7 +536,7 @@ export default function Login() {
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+1 (555) 123-4567"
+                      placeholder="+1 438 801 8302 or 4388018302"
                       required
                       autoFocus
                       style={styles.input}
