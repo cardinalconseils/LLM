@@ -230,7 +230,7 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background-secondary">
+    <div className="flex h-screen w-screen overflow-hidden bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
       {/* Mobile Menu Toggle */}
       <Button
         variant="ghost"

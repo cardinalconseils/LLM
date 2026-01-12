@@ -34,24 +34,24 @@ export default function Sidebar({
   return (
     <aside
       className={cn(
-        'flex flex-col h-full w-80 bg-gradient-to-b from-white to-background-secondary border-r-2 border-border shadow-lg transition-transform duration-300',
-        'max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-50 max-md:shadow-2xl',
+        'flex flex-col h-full w-80 bg-gradient-to-b from-white via-background-secondary/30 to-background-secondary border-r-2 border-border shadow-[0_8px_40px_rgba(0,0,0,0.08)] transition-transform duration-300',
+        'max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-50 max-md:shadow-[0_16px_64px_rgba(0,0,0,0.15)]',
         isOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'
       )}
     >
       {/* Header */}
-      <div className="flex flex-col gap-5 p-6 border-b-2 border-border-light">
+      <div className="flex flex-col gap-6 p-6 border-b-2 border-border-light bg-gradient-to-br from-white to-background-secondary/50">
         {/* Logo */}
         <div className="flex items-center gap-4">
-          <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-hover text-white shadow-lg">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent opacity-20 blur-xl rounded-2xl" />
-            <Users className="relative w-7 h-7" />
+          <div className="relative flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary via-primary-hover to-accent text-white shadow-[0_8px_24px_rgba(45,53,97,0.25)]">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent opacity-25 blur-2xl rounded-2xl" />
+            <Users className="relative w-8 h-8 drop-shadow-lg" />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-xl font-bold text-foreground tracking-tight">
+            <h1 className="text-2xl font-extrabold text-foreground tracking-tight">
               LLM Council
             </h1>
-            <span className="text-xs text-foreground-tertiary font-medium">
+            <span className="text-xs text-foreground-tertiary font-bold uppercase tracking-wide">
               Council Archive
             </span>
           </div>
@@ -60,7 +60,7 @@ export default function Sidebar({
         {/* New Session Button */}
         <Button
           onClick={onNewConversation}
-          className="w-full justify-center gap-2.5 h-12 text-base font-semibold shadow-md hover:shadow-lg bg-gradient-to-r from-primary to-primary-hover"
+          className="w-full justify-center gap-3 h-14 text-base font-bold shadow-[0_6px_20px_rgba(45,53,97,0.15)] hover:shadow-[0_8px_28px_rgba(45,53,97,0.25)] bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary transition-all duration-300"
           variant="default"
         >
           <Plus className="w-5 h-5" />
@@ -72,28 +72,28 @@ export default function Sidebar({
       <ScrollArea className="flex-1">
         <div className="p-4">
           {conversations.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 px-4 text-center animate-fade-in-up">
-              <div className="flex items-center justify-center w-18 h-18 rounded-2xl bg-background-tertiary/50 text-foreground-muted mb-5">
-                <Scroll className="w-9 h-9" />
+            <div className="flex flex-col items-center justify-center py-24 px-4 text-center animate-fade-in-up">
+              <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-background-tertiary to-background-secondary text-foreground-muted mb-6 shadow-lg">
+                <Scroll className="w-10 h-10" />
               </div>
-              <h3 className="text-base font-bold text-foreground mb-2">
+              <h3 className="text-lg font-extrabold text-foreground mb-3">
                 No Sessions Yet
               </h3>
-              <p className="text-sm text-foreground-tertiary leading-relaxed">
+              <p className="text-sm text-foreground-tertiary leading-relaxed max-w-[220px]">
                 Begin a new council session to start deliberating with AI minds
               </p>
             </div>
           ) : (
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-7">
               {Object.entries(groupedConversations).map(([label, convs]) => (
-                <div key={label} className="space-y-2 animate-slide-in-right">
+                <div key={label} className="space-y-3 animate-slide-in-right">
                   {/* Date Header */}
-                  <div className="flex items-center gap-2 px-3 py-1">
-                    <Clock className="w-3.5 h-3.5 text-accent" />
-                    <span className="text-xs font-bold text-accent uppercase tracking-wide">
+                  <div className="flex items-center gap-2.5 px-3 py-1.5">
+                    <Clock className="w-4 h-4 text-accent" />
+                    <span className="text-xs font-extrabold text-accent uppercase tracking-wider">
                       {label}
                     </span>
-                    <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent" />
+                    <div className="flex-1 h-px bg-gradient-to-r from-accent/30 to-transparent" />
                   </div>
 
                   {/* Conversations */}
@@ -102,33 +102,32 @@ export default function Sidebar({
                       key={conv.id}
                       onClick={() => onSelectConversation(conv.id)}
                       className={cn(
-                        'group relative flex items-start gap-3 w-full px-4 py-4 rounded-xl text-left',
-                        'transition-all duration-250',
-                        'hover:shadow-md',
+                        'group relative flex items-start gap-3.5 w-full px-4 py-4 rounded-2xl text-left',
+                        'transition-all duration-300',
                         conv.id === currentConversationId
-                          ? 'bg-gradient-to-br from-primary/8 to-accent/5 shadow-md ring-2 ring-primary/20'
-                          : 'bg-white hover:bg-background-secondary border border-border-light hover:border-primary/30'
+                          ? 'bg-gradient-to-br from-primary/10 to-accent/8 shadow-[0_4px_16px_rgba(45,53,97,0.12)] ring-2 ring-primary/30 scale-[1.01]'
+                          : 'bg-white hover:bg-gradient-to-br hover:from-background-secondary hover:to-background-tertiary/50 border-2 border-border-light hover:border-primary/40 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)]'
                       )}
                       style={{ animationDelay: `${index * 40}ms` }}
                     >
                       {/* Icon */}
                       <div
                         className={cn(
-                          'flex items-center justify-center w-9 h-9 rounded-lg shrink-0',
-                          'transition-all duration-250',
+                          'flex items-center justify-center w-10 h-10 rounded-xl shrink-0',
+                          'transition-all duration-300',
                           conv.id === currentConversationId
-                            ? 'bg-gradient-to-br from-primary to-primary-hover text-white shadow-md'
-                            : 'bg-background-secondary text-foreground-tertiary group-hover:bg-background-tertiary'
+                            ? 'bg-gradient-to-br from-primary to-primary-hover text-white shadow-[0_4px_12px_rgba(45,53,97,0.2)]'
+                            : 'bg-gradient-to-br from-background-secondary to-background-tertiary text-foreground-tertiary group-hover:from-background-tertiary group-hover:to-background-secondary group-hover:text-foreground-secondary group-hover:scale-105'
                         )}
                       >
-                        <MessageSquare className="w-4.5 h-4.5" />
+                        <MessageSquare className="w-5 h-5" />
                       </div>
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div
                           className={cn(
-                            'text-sm font-semibold truncate mb-1.5 leading-tight',
+                            'text-sm font-extrabold truncate mb-1.5 leading-tight',
                             conv.id === currentConversationId
                               ? 'text-primary'
                               : 'text-foreground group-hover:text-primary'
@@ -136,8 +135,8 @@ export default function Sidebar({
                         >
                           {conv.title || 'Untitled Session'}
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-foreground-tertiary">
-                          <span className="font-medium">
+                        <div className="flex items-center gap-2 text-xs text-foreground-tertiary font-medium">
+                          <span>
                             {conv.message_count} {conv.message_count === 1 ? 'exchange' : 'exchanges'}
                           </span>
                           <span className="w-1 h-1 rounded-full bg-foreground-muted" />
@@ -153,7 +152,7 @@ export default function Sidebar({
                       {/* Active Indicator */}
                       {conv.id === currentConversationId && (
                         <div className="absolute right-4 top-4">
-                          <div className="w-2 h-2 rounded-full bg-accent animate-pulse-glow" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_10px_rgba(212,165,116,0.6)] animate-pulse-glow" />
                         </div>
                       )}
                     </button>
@@ -166,12 +165,12 @@ export default function Sidebar({
       </ScrollArea>
 
       {/* Footer */}
-      <div className="p-5 border-t-2 border-border-light bg-background-secondary/50">
-        <div className="flex items-center gap-3 px-3 py-2 bg-white rounded-xl border border-border-light shadow-sm">
-          <div className="flex items-center justify-center w-2 h-2 rounded-full bg-success animate-pulse" />
+      <div className="p-5 border-t-2 border-border-light bg-gradient-to-br from-background-secondary/50 to-background-tertiary/30">
+        <div className="flex items-center gap-4 px-4 py-3 bg-white rounded-2xl border-2 border-border-light shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center justify-center w-2.5 h-2.5 rounded-full bg-success shadow-[0_0_8px_rgba(74,157,111,0.5)] animate-pulse" />
           <div className="flex-1">
-            <div className="text-xs font-semibold text-foreground">System Active</div>
-            <div className="text-[10px] text-foreground-tertiary">Powered by OpenRouter</div>
+            <div className="text-xs font-extrabold text-foreground">System Active</div>
+            <div className="text-[10px] text-foreground-tertiary font-medium">Powered by OpenRouter</div>
           </div>
         </div>
       </div>

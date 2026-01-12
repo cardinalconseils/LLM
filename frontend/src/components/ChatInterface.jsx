@@ -139,48 +139,57 @@ export default function ChatInterface({
   // Empty state - no conversation selected
   if (!conversation) {
     return (
-      <main className="flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
-        <div className="w-full max-w-5xl">
+      <main className="flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-[#fdfbf7] via-[#f5f3ed] to-[#eae7df] relative overflow-hidden">
+        {/* Ambient Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-br from-accent/10 to-primary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+        </div>
+
+        <div className="w-full max-w-6xl relative z-10">
           {/* Hero Section */}
-          <div className="text-center mb-16 animate-fade-in-up">
+          <div className="text-center mb-20 animate-fade-in-up">
             {/* Council Logo */}
-            <div className="relative inline-flex items-center justify-center mb-8">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent opacity-20 blur-3xl rounded-full animate-pulse-glow" />
-              <div className="relative flex items-center justify-center w-32 h-32 rounded-3xl bg-gradient-to-br from-primary to-primary-hover text-white shadow-2xl">
-                <Users className="w-16 h-16" />
+            <div className="relative inline-flex items-center justify-center mb-10">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent opacity-30 blur-3xl rounded-full animate-pulse-glow" />
+              <div className="relative flex items-center justify-center w-40 h-40 rounded-[2.5rem] bg-gradient-to-br from-primary via-primary-hover to-accent text-white shadow-[0_20px_60px_rgba(45,53,97,0.3)]">
+                <Users className="w-20 h-20 drop-shadow-lg" />
               </div>
             </div>
 
             {/* Title */}
-            <h1 className="text-5xl font-bold text-foreground mb-4 tracking-tight">
+            <h1 className="text-6xl md:text-7xl font-extrabold text-foreground mb-6 tracking-tight">
               LLM Council
             </h1>
-            <p className="text-xl text-foreground-secondary max-w-2xl mx-auto leading-relaxed">
+            <p className="text-2xl text-foreground-secondary max-w-3xl mx-auto leading-relaxed font-medium">
               Where the world's most advanced AI models gather to deliberate, debate, and deliver excellence
             </p>
           </div>
 
           {/* Mode Selector - Premium Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             {Object.entries(modes).map(([key, { icon: Icon, name, tagline, description, color }], index) => (
               <button
                 key={key}
                 onClick={() => onModeChange(key)}
                 className={cn(
                   'group relative overflow-hidden',
-                  'flex flex-col p-8 rounded-2xl text-left',
-                  'bg-white border border-border-light',
-                  'shadow-md hover:shadow-xl',
-                  'transition-all duration-400',
-                  mode === key ? 'ring-2 ring-primary ring-offset-4 ring-offset-background scale-105' : 'hover:scale-102',
+                  'flex flex-col p-10 rounded-3xl text-left',
+                  'bg-white border-2',
+                  'shadow-[0_8px_30px_rgba(0,0,0,0.08)]',
+                  'hover:shadow-[0_16px_48px_rgba(0,0,0,0.12)]',
+                  'transition-all duration-500 ease-out',
+                  mode === key
+                    ? 'border-primary ring-4 ring-primary/20 scale-[1.02] shadow-[0_16px_48px_rgba(45,53,97,0.15)]'
+                    : 'border-border-light hover:border-primary/40 hover:scale-[1.01]',
                   'animate-council-gather'
                 )}
-                style={{ animationDelay: `${index * 100}ms` }}
+                style={{ animationDelay: `${index * 120}ms` }}
               >
                 {/* Background Gradient (subtle) */}
                 <div
                   className={cn(
-                    'absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-400',
+                    'absolute inset-0 opacity-0 group-hover:opacity-8 transition-opacity duration-500',
                     'bg-gradient-to-br',
                     color
                   )}
@@ -189,32 +198,37 @@ export default function ChatInterface({
                 {/* Icon */}
                 <div
                   className={cn(
-                    'relative z-10 flex items-center justify-center w-14 h-14 rounded-2xl mb-4',
-                    'transition-all duration-300 shadow-lg',
+                    'relative z-10 flex items-center justify-center w-16 h-16 rounded-2xl mb-5',
+                    'transition-all duration-400 shadow-lg',
                     mode === key
-                      ? 'bg-gradient-to-br from-primary to-primary-hover text-white scale-110'
-                      : 'bg-background-secondary text-foreground-tertiary group-hover:bg-background-tertiary group-hover:scale-105'
+                      ? 'bg-gradient-to-br from-primary to-primary-hover text-white scale-110 shadow-[0_8px_24px_rgba(45,53,97,0.25)]'
+                      : 'bg-gradient-to-br from-background-secondary to-background-tertiary text-foreground-tertiary group-hover:from-background-tertiary group-hover:to-background-secondary group-hover:scale-110 group-hover:text-foreground-secondary'
                   )}
                 >
-                  <Icon className="w-7 h-7" />
+                  <Icon className="w-8 h-8" />
                 </div>
 
                 {/* Content */}
                 <div className="relative z-10 flex-1">
-                  <div className="text-sm font-semibold text-accent mb-1">{tagline}</div>
-                  <h3 className="text-lg font-bold text-foreground mb-2">{name}</h3>
-                  <p className="text-sm text-foreground-tertiary leading-relaxed">
+                  <div className="text-sm font-bold text-accent mb-2 uppercase tracking-wide">{tagline}</div>
+                  <h3 className="text-xl font-extrabold text-foreground mb-3 leading-tight">{name}</h3>
+                  <p className="text-base text-foreground-tertiary leading-relaxed">
                     {description}
                   </p>
                 </div>
 
                 {/* Selection Indicator */}
                 {mode === key && (
-                  <div className="absolute top-4 right-4 flex items-center gap-1.5">
-                    <span className="text-xs font-medium text-accent">Active</span>
-                    <div className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse-glow" />
+                  <div className="absolute top-6 right-6 flex items-center gap-2">
+                    <span className="text-xs font-bold text-accent uppercase tracking-wide">Active</span>
+                    <div className="w-3 h-3 rounded-full bg-accent shadow-[0_0_12px_rgba(212,165,116,0.6)] animate-pulse-glow" />
                   </div>
                 )}
+
+                {/* Hover Shine Effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+                </div>
               </button>
             ))}
           </div>
@@ -225,9 +239,9 @@ export default function ChatInterface({
               variant="outline"
               size="lg"
               onClick={() => setShowModelSelector(true)}
-              className="gap-2 px-6 py-3 text-base font-medium shadow-md hover:shadow-lg border-2"
+              className="gap-3 px-8 py-4 text-lg font-bold shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] border-2 border-border hover:border-primary/60 bg-white hover:bg-background-secondary/50 transition-all duration-300"
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="w-6 h-6" />
               Configure Council Members
             </Button>
           </div>
@@ -248,19 +262,19 @@ export default function ChatInterface({
   }
 
   return (
-    <main className="flex-1 flex flex-col h-full bg-background overflow-hidden">
+    <main className="flex-1 flex flex-col h-full bg-gradient-to-b from-[#fdfbf7] via-[#f5f3ed] to-[#eae7df] overflow-hidden">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-background via-background-secondary/30 to-background">
-        <div className="max-w-5xl mx-auto px-8 py-8 w-full">
+      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-transparent via-white/30 to-transparent">
+        <div className="max-w-5xl mx-auto px-8 py-10 w-full">
           {conversation.messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-32 text-center animate-fade-in-up">
-              <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-background-tertiary to-background-secondary text-foreground-tertiary mb-6 shadow-md">
-                <MessageSquare className="w-10 h-10" />
+              <div className="flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-background-tertiary to-background-secondary text-foreground-tertiary mb-8 shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
+                <MessageSquare className="w-12 h-12" />
               </div>
-              <h2 className="text-2xl font-bold text-foreground mb-3">
+              <h2 className="text-3xl font-extrabold text-foreground mb-4">
                 The Council Awaits
               </h2>
-              <p className="text-foreground-secondary text-lg max-w-md">
+              <p className="text-foreground-secondary text-xl max-w-lg leading-relaxed font-medium">
                 Pose your question below and watch as multiple AI minds deliberate to find the answer
               </p>
             </div>
@@ -273,30 +287,30 @@ export default function ChatInterface({
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   {msg.role === 'user' ? (
-                    <div className="flex gap-5 justify-end">
+                    <div className="flex gap-6 justify-end">
                       <div className="flex-1 max-w-3xl">
-                        <div className="text-xs font-semibold text-foreground-tertiary mb-2 text-right">
+                        <div className="text-xs font-bold text-foreground-tertiary mb-3 text-right uppercase tracking-wide">
                           You
                         </div>
-                        <Card className="shadow-lg border-2 border-border-light bg-white">
+                        <Card className="shadow-[0_8px_24px_rgba(0,0,0,0.08)] border-2 border-border-light bg-white hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] transition-shadow duration-300">
                           <div className="markdown-content text-base">
                             <ReactMarkdown>{msg.content}</ReactMarkdown>
                           </div>
                         </Card>
                       </div>
-                      <div className="flex items-start justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-foreground-tertiary to-foreground text-white shrink-0 shadow-lg">
-                        <User className="w-6 h-6 mt-3" />
+                      <div className="flex items-start justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-foreground-tertiary to-foreground text-white shrink-0 shadow-[0_6px_20px_rgba(0,0,0,0.15)]">
+                        <User className="w-7 h-7 mt-3.5" />
                       </div>
                     </div>
                   ) : (
-                    <div className="flex gap-5">
-                      <div className="flex items-start justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary-hover text-white shrink-0 shadow-lg animate-pulse-glow">
-                        <Users className="w-6 h-6 mt-3" />
+                    <div className="flex gap-6">
+                      <div className="flex items-start justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary via-primary-hover to-accent text-white shrink-0 shadow-[0_8px_24px_rgba(45,53,97,0.25)] animate-pulse-glow">
+                        <Users className="w-7 h-7 mt-3.5 drop-shadow-lg" />
                       </div>
-                      <div className="flex-1 min-w-0 space-y-6 max-w-full">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-foreground">The Council</span>
-                          <div className="h-px flex-1 bg-gradient-to-r from-border to-transparent" />
+                      <div className="flex-1 min-w-0 space-y-7 max-w-full">
+                        <div className="flex items-center gap-3">
+                          <span className="text-base font-extrabold text-foreground">The Council</span>
+                          <div className="h-0.5 flex-1 bg-gradient-to-r from-border via-border/50 to-transparent rounded-full" />
                         </div>
 
                         {/* Stage 1 */}
@@ -334,13 +348,13 @@ export default function ChatInterface({
       </div>
 
       {/* Input Area */}
-      <div className="border-t-2 border-border-light bg-white shadow-2xl">
+      <div className="border-t-2 border-border shadow-[0_-8px_40px_rgba(0,0,0,0.06)] bg-gradient-to-b from-white to-background-secondary/30">
         <form
           onSubmit={handleSubmit}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className="max-w-5xl mx-auto px-8 py-6 w-full"
+          className="max-w-5xl mx-auto px-8 py-7 w-full"
         >
           {/* Drag Overlay */}
           {isDragOver && (
@@ -439,7 +453,7 @@ export default function ChatInterface({
                 type="button"
                 variant="destructive"
                 onClick={onStopGeneration}
-                className="gap-2 px-6 py-3 h-auto text-base font-medium shadow-lg"
+                className="gap-3 px-7 py-4 h-auto text-base font-bold shadow-[0_6px_20px_rgba(199,75,75,0.2)] hover:shadow-[0_8px_28px_rgba(199,75,75,0.3)] transition-all duration-300"
               >
                 <Square className="w-5 h-5 fill-current" />
                 Stop
@@ -448,7 +462,7 @@ export default function ChatInterface({
               <Button
                 type="submit"
                 disabled={!input.trim()}
-                className="gap-2 px-6 py-3 h-auto text-base font-medium bg-gradient-to-r from-primary to-primary-hover shadow-lg hover:shadow-xl disabled:opacity-50"
+                className="gap-3 px-7 py-4 h-auto text-base font-bold bg-gradient-to-r from-primary via-primary-hover to-accent shadow-[0_6px_20px_rgba(45,53,97,0.2)] hover:shadow-[0_8px_28px_rgba(45,53,97,0.3)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
               >
                 <Send className="w-5 h-5" />
                 Send
@@ -500,26 +514,26 @@ function LoadingState({ stage, text, variant = 'default' }) {
   return (
     <div
       className={cn(
-        'flex items-center gap-4 p-5 rounded-2xl shadow-md border',
+        'flex items-center gap-5 p-6 rounded-3xl shadow-[0_8px_24px_rgba(0,0,0,0.06)] border-2',
         variant === 'success'
-          ? 'bg-success-bg border-success-border/30'
-          : 'bg-background-secondary border-border-light'
+          ? 'bg-gradient-to-br from-success-bg to-success-bg/50 border-success-border/40'
+          : 'bg-gradient-to-br from-background-secondary to-background-tertiary/50 border-border-light'
       )}
     >
-      <div className="flex gap-1.5">
-        <span className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
+      <div className="flex gap-2">
+        <span className="w-3 h-3 rounded-full bg-accent shadow-[0_0_8px_rgba(212,165,116,0.4)] animate-pulse" />
         <span
-          className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse"
+          className="w-3 h-3 rounded-full bg-accent shadow-[0_0_8px_rgba(212,165,116,0.4)] animate-pulse"
           style={{ animationDelay: '200ms' }}
         />
         <span
-          className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse"
+          className="w-3 h-3 rounded-full bg-accent shadow-[0_0_8px_rgba(212,165,116,0.4)] animate-pulse"
           style={{ animationDelay: '400ms' }}
         />
       </div>
       <div>
-        <span className="font-bold text-foreground">Stage {stage}</span>
-        <span className="text-foreground-secondary ml-2 text-sm">{text}</span>
+        <span className="font-extrabold text-foreground text-base">Stage {stage}</span>
+        <span className="text-foreground-secondary ml-3 text-sm font-medium">{text}</span>
       </div>
     </div>
   )
