@@ -2,13 +2,23 @@ import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from './ui/button'
 import { Mail, Phone, ArrowLeft, Loader2, Users, Shield, KeyRound } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 export default function Login() {
   const { signInWithEmail, signInWithPhone, verifyEmailOtp, verifyPhoneOtp } = useAuth()
 
   const [mode, setMode] = useState(null) // 'email' | 'phone' | null
   const [step, setStep] = useState('input') // 'input' | 'verify'
+
+  // Force full viewport layout
+  const containerStyle = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100vw',
+    height: '100vh',
+  }
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [otp, setOtp] = useState('')
@@ -94,93 +104,318 @@ export default function Login() {
     }
   }
 
-  // Mode selection screen - Premium council aesthetic
+  // Inline styles for reliable rendering
+  const styles = {
+    container: {
+      ...containerStyle,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #fdfbf7 0%, #f5f3ed 50%, #eae7df 100%)',
+      padding: '24px',
+      overflow: 'auto',
+    },
+    wrapper: {
+      width: '100%',
+      maxWidth: '448px',
+    },
+    logoSection: {
+      textAlign: 'center',
+      marginBottom: '48px',
+    },
+    logoContainer: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '96px',
+      height: '96px',
+      borderRadius: '24px',
+      background: 'linear-gradient(135deg, #2d3561 0%, #3d4676 100%)',
+      color: 'white',
+      boxShadow: '0 16px 48px rgba(29, 33, 45, 0.15)',
+      marginBottom: '24px',
+    },
+    title: {
+      fontSize: '2.25rem',
+      fontWeight: '700',
+      color: '#1a1d2e',
+      marginBottom: '8px',
+      letterSpacing: '-0.025em',
+    },
+    subtitle: {
+      fontSize: '1.125rem',
+      color: '#4a4d5e',
+    },
+    card: {
+      backgroundColor: 'white',
+      borderRadius: '16px',
+      boxShadow: '0 16px 48px rgba(29, 33, 45, 0.10), 0 8px 16px rgba(29, 33, 45, 0.05)',
+      border: '2px solid #e8e5dd',
+      overflow: 'hidden',
+    },
+    cardContent: {
+      padding: '32px',
+    },
+    headerSection: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      marginBottom: '24px',
+      paddingBottom: '24px',
+      borderBottom: '2px solid #e8e5dd',
+    },
+    iconBox: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '40px',
+      height: '40px',
+      borderRadius: '12px',
+      background: 'linear-gradient(135deg, rgba(45, 53, 97, 0.1) 0%, rgba(212, 165, 116, 0.05) 100%)',
+    },
+    headerText: {
+      flex: 1,
+    },
+    headerTitle: {
+      fontSize: '1.125rem',
+      fontWeight: '700',
+      color: '#1a1d2e',
+      marginBottom: '4px',
+    },
+    headerSubtitle: {
+      fontSize: '0.875rem',
+      color: '#6b6e7e',
+    },
+    optionButton: {
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '16px',
+      padding: '20px',
+      borderRadius: '12px',
+      textAlign: 'left',
+      background: 'linear-gradient(135deg, #f5f3ed 0%, #fdfbf7 100%)',
+      border: '2px solid #e8e5dd',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+      marginBottom: '12px',
+    },
+    optionIconBox: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '48px',
+      height: '48px',
+      borderRadius: '12px',
+      background: 'linear-gradient(135deg, rgba(45, 53, 97, 0.1) 0%, rgba(212, 165, 116, 0.05) 100%)',
+      boxShadow: '0 4px 8px rgba(29, 33, 45, 0.06)',
+      flexShrink: 0,
+    },
+    optionContent: {
+      flex: 1,
+      minWidth: 0,
+    },
+    optionTitle: {
+      fontSize: '1rem',
+      fontWeight: '600',
+      color: '#1a1d2e',
+      marginBottom: '4px',
+    },
+    optionSubtitle: {
+      fontSize: '0.875rem',
+      color: '#6b6e7e',
+    },
+    footer: {
+      padding: '20px 32px',
+      background: 'linear-gradient(90deg, rgba(245, 243, 237, 0.5) 0%, transparent 100%)',
+      borderTop: '2px solid #e8e5dd',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      fontSize: '0.75rem',
+      color: '#6b6e7e',
+    },
+    backButton: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      background: 'none',
+      border: 'none',
+      color: '#6b6e7e',
+      fontSize: '0.875rem',
+      fontWeight: '500',
+      cursor: 'pointer',
+      padding: '0',
+      marginBottom: '24px',
+    },
+    formHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '16px',
+      marginBottom: '32px',
+    },
+    formIconBox: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '56px',
+      height: '56px',
+      borderRadius: '16px',
+      background: 'linear-gradient(135deg, rgba(45, 53, 97, 0.1) 0%, rgba(212, 165, 116, 0.05) 100%)',
+      boxShadow: '0 8px 24px rgba(29, 33, 45, 0.08)',
+      flexShrink: 0,
+    },
+    formTitle: {
+      fontSize: '1.5rem',
+      fontWeight: '700',
+      color: '#1a1d2e',
+      marginBottom: '4px',
+    },
+    formSubtitle: {
+      fontSize: '0.875rem',
+      color: '#4a4d5e',
+    },
+    messageBox: {
+      marginBottom: '24px',
+      padding: '16px',
+      borderRadius: '12px',
+      fontSize: '0.875rem',
+      fontWeight: '500',
+    },
+    successBox: {
+      backgroundColor: '#f0f9f4',
+      border: '2px solid rgba(74, 157, 111, 0.3)',
+      color: '#4a9d6f',
+    },
+    errorBox: {
+      backgroundColor: '#fdf2f2',
+      border: '2px solid rgba(199, 75, 75, 0.3)',
+      color: '#c74b4b',
+    },
+    label: {
+      display: 'block',
+      fontSize: '0.875rem',
+      fontWeight: '600',
+      color: '#1a1d2e',
+      marginBottom: '12px',
+    },
+    input: {
+      width: '100%',
+      height: '56px',
+      padding: '0 20px',
+      fontSize: '1rem',
+      border: '2px solid #e8e5dd',
+      borderRadius: '12px',
+      outline: 'none',
+      color: '#1a1d2e',
+      transition: 'all 0.2s ease',
+    },
+    otpInput: {
+      width: '100%',
+      height: '80px',
+      padding: '0 24px',
+      fontSize: '2.25rem',
+      fontFamily: 'monospace',
+      fontWeight: '700',
+      textAlign: 'center',
+      letterSpacing: '0.5em',
+      border: '2px solid #e8e5dd',
+      borderRadius: '12px',
+      outline: 'none',
+      color: '#1a1d2e',
+      transition: 'all 0.2s ease',
+    },
+    resendButton: {
+      width: '100%',
+      background: 'none',
+      border: 'none',
+      color: '#6b6e7e',
+      fontSize: '0.875rem',
+      fontWeight: '500',
+      cursor: 'pointer',
+      padding: '8px',
+      marginTop: '16px',
+    },
+  }
+
+  // Mode selection screen
   if (!mode) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background-secondary to-background-tertiary p-6">
-        <div className="w-full max-w-lg animate-fade-in-up">
-          {/* Council Logo */}
-          <div className="text-center mb-12">
-            <div className="relative inline-flex items-center justify-center mb-6">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent opacity-20 blur-3xl rounded-full animate-pulse-glow" />
-              <div className="relative flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-primary to-primary-hover text-white shadow-2xl">
-                <Users className="w-12 h-12" />
-              </div>
+      <div style={styles.container} className="w-full">
+        <div style={styles.wrapper} className="w-full">
+          {/* Logo Section */}
+          <div style={styles.logoSection}>
+            <div style={styles.logoContainer}>
+              <Users size={48} />
             </div>
-            <h1 className="text-4xl font-bold text-foreground mb-3 tracking-tight">
-              LLM Council
-            </h1>
-            <p className="text-lg text-foreground-secondary">
-              Enter the Council Chamber
-            </p>
+            <h1 style={styles.title}>LLM Council</h1>
+            <p style={styles.subtitle}>Enter the Council Chamber</p>
           </div>
 
           {/* Authentication Card */}
-          <div className="bg-white rounded-2xl shadow-2xl border-2 border-border-light overflow-hidden">
-            <div className="p-8">
-              <div className="flex items-center gap-3 mb-6 pb-6 border-b-2 border-border-light">
-                <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-accent/5">
-                  <Shield className="w-5 h-5 text-primary" />
+          <div style={styles.card}>
+            <div style={styles.cardContent}>
+              <div style={styles.headerSection}>
+                <div style={styles.iconBox}>
+                  <Shield size={20} style={{ color: '#2d3561' }} />
                 </div>
-                <div>
-                  <h2 className="text-lg font-bold text-foreground">Secure Authentication</h2>
-                  <p className="text-sm text-foreground-tertiary">Choose your verification method</p>
+                <div style={styles.headerText}>
+                  <div style={styles.headerTitle}>Secure Authentication</div>
+                  <div style={styles.headerSubtitle}>Choose your verification method</div>
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div>
                 <button
                   onClick={() => setMode('email')}
-                  className={cn(
-                    'group relative w-full flex items-center gap-4 p-5 rounded-xl text-left',
-                    'bg-gradient-to-br from-background-secondary to-background',
-                    'border-2 border-border-light hover:border-primary/40',
-                    'shadow-sm hover:shadow-md',
-                    'transition-all duration-250',
-                    'animate-council-gather'
-                  )}
-                  style={{ animationDelay: '100ms' }}
+                  style={styles.optionButton}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(45, 53, 97, 0.4)'
+                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(29, 33, 45, 0.06)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = '#e8e5dd'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
                 >
-                  <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/5 shadow-md group-hover:scale-110 transition-transform duration-250">
-                    <Mail className="w-6 h-6 text-primary" />
+                  <div style={styles.optionIconBox}>
+                    <Mail size={24} style={{ color: '#2d3561' }} />
                   </div>
-                  <div className="flex-1">
-                    <div className="font-semibold text-foreground mb-1">Continue with Email</div>
-                    <div className="text-sm text-foreground-tertiary">Receive OTP via email</div>
+                  <div style={styles.optionContent}>
+                    <div style={styles.optionTitle}>Continue with Email</div>
+                    <div style={styles.optionSubtitle}>Receive OTP via email</div>
                   </div>
-                  <ArrowLeft className="w-5 h-5 text-foreground-muted rotate-180 group-hover:translate-x-1 transition-transform" />
+                  <ArrowLeft size={20} style={{ color: '#9b9dad', transform: 'rotate(180deg)', flexShrink: 0 }} />
                 </button>
 
                 <button
                   onClick={() => setMode('phone')}
-                  className={cn(
-                    'group relative w-full flex items-center gap-4 p-5 rounded-xl text-left',
-                    'bg-gradient-to-br from-background-secondary to-background',
-                    'border-2 border-border-light hover:border-primary/40',
-                    'shadow-sm hover:shadow-md',
-                    'transition-all duration-250',
-                    'animate-council-gather'
-                  )}
-                  style={{ animationDelay: '200ms' }}
+                  style={styles.optionButton}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(45, 53, 97, 0.4)'
+                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(29, 33, 45, 0.06)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = '#e8e5dd'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
                 >
-                  <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/5 shadow-md group-hover:scale-110 transition-transform duration-250">
-                    <Phone className="w-6 h-6 text-primary" />
+                  <div style={styles.optionIconBox}>
+                    <Phone size={24} style={{ color: '#2d3561' }} />
                   </div>
-                  <div className="flex-1">
-                    <div className="font-semibold text-foreground mb-1">Continue with Phone</div>
-                    <div className="text-sm text-foreground-tertiary">Receive OTP via SMS</div>
+                  <div style={styles.optionContent}>
+                    <div style={styles.optionTitle}>Continue with Phone</div>
+                    <div style={styles.optionSubtitle}>Receive OTP via SMS</div>
                   </div>
-                  <ArrowLeft className="w-5 h-5 text-foreground-muted rotate-180 group-hover:translate-x-1 transition-transform" />
+                  <ArrowLeft size={20} style={{ color: '#9b9dad', transform: 'rotate(180deg)', flexShrink: 0 }} />
                 </button>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="px-8 py-5 bg-gradient-to-r from-background-secondary/50 to-transparent border-t-2 border-border-light">
-              <div className="flex items-center gap-2 text-xs text-foreground-tertiary">
-                <KeyRound className="w-3.5 h-3.5 text-accent" />
-                <span className="font-medium">Authorized council members only</span>
-              </div>
+            <div style={styles.footer}>
+              <KeyRound size={14} style={{ color: '#d4a574' }} />
+              <span style={{ fontWeight: '500' }}>Authorized council members only</span>
             </div>
           </div>
         </div>
@@ -188,67 +423,69 @@ export default function Login() {
     )
   }
 
-  // Email/Phone input or OTP verification screen - Premium design
+  // Email/Phone input or OTP verification screen
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background-secondary to-background-tertiary p-6">
-      <div className="w-full max-w-lg animate-fade-in-up">
-        <div className="bg-white rounded-2xl shadow-2xl border-2 border-border-light overflow-hidden">
-          {/* Header */}
-          <div className="relative p-8 pb-6 bg-gradient-to-r from-background-secondary/50 to-transparent border-b-2 border-border-light">
+    <div style={styles.container} className="w-full">
+      <div style={styles.wrapper} className="w-full">
+        <div style={styles.card}>
+          <div style={styles.cardContent}>
+            {/* Back Button */}
             <button
               onClick={handleBack}
-              className="flex items-center gap-2 text-foreground-tertiary hover:text-primary text-sm font-medium mb-6 transition-colors group"
+              style={styles.backButton}
+              onMouseOver={(e) => e.currentTarget.style.color = '#2d3561'}
+              onMouseOut={(e) => e.currentTarget.style.color = '#6b6e7e'}
             >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              <ArrowLeft size={16} />
               Back
             </button>
 
-            <div className="flex items-center gap-4">
-              <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 shadow-lg">
+            {/* Form Header */}
+            <div style={styles.formHeader}>
+              <div style={styles.formIconBox}>
                 {mode === 'email' ? (
-                  <Mail className="w-7 h-7 text-primary" />
+                  <Mail size={28} style={{ color: '#2d3561' }} />
                 ) : (
-                  <Phone className="w-7 h-7 text-primary" />
+                  <Phone size={28} style={{ color: '#2d3561' }} />
                 )}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-foreground mb-1">
+                <h2 style={styles.formTitle}>
                   {step === 'input'
                     ? `${mode === 'email' ? 'Email' : 'Phone'} Verification`
                     : 'Enter Your Code'
                   }
                 </h2>
-                <p className="text-sm text-foreground-secondary">
+                <p style={styles.formSubtitle}>
                   {step === 'input'
-                    ? 'We'll send you a secure one-time code'
-                    : 'Check your ' + (mode === 'email' ? 'inbox' : 'messages')
+                    ? "We'll send you a secure one-time code"
+                    : `Check your ${mode === 'email' ? 'inbox' : 'messages'}`
                   }
                 </p>
               </div>
             </div>
-          </div>
 
-          {/* Content */}
-          <div className="p-8">
+            {/* Messages */}
             {message && (
-              <div className="mb-6 p-4 bg-success-bg border-2 border-success-border/30 rounded-xl">
-                <p className="text-success font-medium text-sm">{message}</p>
+              <div style={{ ...styles.messageBox, ...styles.successBox }}>
+                {message}
               </div>
             )}
 
             {error && (
-              <div className="mb-6 p-4 bg-error-bg border-2 border-error-border/30 rounded-xl">
-                <p className="text-error font-medium text-sm">{error}</p>
+              <div style={{ ...styles.messageBox, ...styles.errorBox }}>
+                {error}
               </div>
             )}
 
+            {/* Forms */}
             {step === 'input' ? (
-              <form onSubmit={handleSendOtp} className="space-y-6">
-                {mode === 'email' ? (
-                  <div>
-                    <label className="block text-sm font-semibold text-foreground mb-3">
-                      Email Address
-                    </label>
+              <form onSubmit={handleSendOtp}>
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={styles.label}>
+                    {mode === 'email' ? 'Email Address' : 'Phone Number'}
+                  </label>
+                  {mode === 'email' ? (
                     <input
                       type="email"
                       value={email}
@@ -256,14 +493,17 @@ export default function Login() {
                       placeholder="you@example.com"
                       required
                       autoFocus
-                      className="w-full h-14 px-5 border-2 border-border-light rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-foreground text-base placeholder:text-foreground-muted transition-all"
+                      style={styles.input}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = '#2d3561'
+                        e.target.style.boxShadow = '0 0 0 3px rgba(45, 53, 97, 0.08)'
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = '#e8e5dd'
+                        e.target.style.boxShadow = 'none'
+                      }}
                     />
-                  </div>
-                ) : (
-                  <div>
-                    <label className="block text-sm font-semibold text-foreground mb-3">
-                      Phone Number
-                    </label>
+                  ) : (
                     <input
                       type="tel"
                       value={phone}
@@ -271,15 +511,27 @@ export default function Login() {
                       placeholder="+1 (555) 123-4567"
                       required
                       autoFocus
-                      className="w-full h-14 px-5 border-2 border-border-light rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-foreground text-base placeholder:text-foreground-muted transition-all"
+                      style={styles.input}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = '#2d3561'
+                        e.target.style.boxShadow = '0 0 0 3px rgba(45, 53, 97, 0.08)'
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = '#e8e5dd'
+                        e.target.style.boxShadow = 'none'
+                      }}
                     />
-                  </div>
-                )}
+                  )}
+                </div>
 
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-14 text-base font-semibold bg-gradient-to-r from-primary to-primary-hover shadow-lg hover:shadow-xl"
+                  className="w-full h-14 text-base font-semibold"
+                  style={{
+                    background: 'linear-gradient(90deg, #2d3561 0%, #3d4676 100%)',
+                    boxShadow: '0 8px 24px rgba(29, 33, 45, 0.08)',
+                  }}
                 >
                   {loading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -292,9 +544,9 @@ export default function Login() {
                 </Button>
               </form>
             ) : (
-              <form onSubmit={handleVerifyOtp} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-semibold text-foreground mb-3 text-center">
+              <form onSubmit={handleVerifyOtp}>
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ ...styles.label, textAlign: 'center' }}>
                     6-Digit Verification Code
                   </label>
                   <input
@@ -305,14 +557,28 @@ export default function Login() {
                     required
                     autoFocus
                     maxLength={6}
-                    className="w-full h-20 px-6 border-2 border-border-light rounded-xl focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent text-foreground text-center text-4xl tracking-[0.5em] font-mono font-bold placeholder:text-foreground-muted/30 transition-all"
+                    style={styles.otpInput}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#d4a574'
+                      e.target.style.boxShadow = '0 0 0 3px rgba(212, 165, 116, 0.12)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '#e8e5dd'
+                      e.target.style.boxShadow = 'none'
+                    }}
                   />
                 </div>
 
                 <Button
                   type="submit"
                   disabled={loading || otp.length !== 6}
-                  className="w-full h-14 text-base font-semibold bg-gradient-to-r from-accent to-accent-hover text-accent-foreground shadow-lg hover:shadow-xl disabled:opacity-50"
+                  className="w-full h-14 text-base font-semibold"
+                  style={{
+                    background: 'linear-gradient(90deg, #d4a574 0%, #e6c299 100%)',
+                    color: '#1a1d2e',
+                    boxShadow: '0 8px 24px rgba(29, 33, 45, 0.08)',
+                    opacity: loading || otp.length !== 6 ? 0.5 : 1,
+                  }}
                 >
                   {loading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -332,7 +598,9 @@ export default function Login() {
                     setError('')
                     setMessage('')
                   }}
-                  className="w-full text-sm text-foreground-tertiary hover:text-primary font-medium transition-colors"
+                  style={styles.resendButton}
+                  onMouseOver={(e) => e.currentTarget.style.color = '#2d3561'}
+                  onMouseOut={(e) => e.currentTarget.style.color = '#6b6e7e'}
                 >
                   Didn't receive the code? Send again
                 </button>
