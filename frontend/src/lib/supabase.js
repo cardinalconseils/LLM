@@ -14,7 +14,8 @@ export const supabase = createClient(
     auth: {
       autoRefreshToken: true,
       persistSession: true,
-      detectSessionInUrl: true
+      detectSessionInUrl: false, // Disable magic link detection, use OTP only
+      flowType: 'pkce' // Use PKCE flow for better security
     }
   }
 )

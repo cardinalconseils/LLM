@@ -95,10 +95,20 @@ The application uses Supabase for authentication with the following characterist
 - Supports both **email** and **phone** login via OTP (One-Time Password)
 - The `shouldCreateUser: false` option ensures only pre-existing users can log in
 
+### Email OTP Configuration
+**IMPORTANT**: Email authentication uses 6-digit OTP codes (NOT magic links)
+
+To configure email OTP in Supabase Dashboard:
+1. Go to: Authentication > Email Templates
+2. Edit "Magic Link" template to use `{{ .Token }}` instead of `{{ .ConfirmationURL }}`
+3. Go to: Authentication > Providers > Email
+4. **DISABLE** "Confirm email" setting
+5. See `SUPABASE_EMAIL_OTP_SETUP.md` for detailed instructions
+
 ### Authentication Flow
 1. User selects email or phone login method
-2. Supabase sends OTP to the provided email/phone
-3. User enters the 6-digit verification code
+2. Supabase sends **6-digit OTP code** to the provided email/phone
+3. User enters the 6-digit verification code in the UI
 4. On successful verification, user is authenticated and can access the app
 
 ### Key Files

@@ -36,12 +36,16 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  // Sign in with email (magic link or OTP)
+  // Sign in with email OTP (6-digit code)
   const signInWithEmail = async (email) => {
     const { data, error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        shouldCreateUser: false // Login only, no signup
+        shouldCreateUser: false, // Login only, no signup
+        // Do NOT include emailRedirectTo - this forces OTP token instead of magic link
+        data: {
+          // Optional: add custom metadata if needed
+        }
       }
     })
     return { data, error }
