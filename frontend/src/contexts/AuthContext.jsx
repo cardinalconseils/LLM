@@ -53,12 +53,11 @@ export function AuthProvider({ children }) {
 
   // Sign in with phone (OTP)
   const signInWithPhone = async (phone) => {
-    // Note: We don't use shouldCreateUser: false for phone auth because:
-    // 1. It requires phone to be "confirmed" in Supabase, which is manual
-    // 2. OTP will still only work for registered users during verification
-    // 3. This provides better UX - user gets OTP, but can't login if not registered
     const { data, error } = await supabase.auth.signInWithOtp({
-      phone
+      phone,
+      options: {
+        shouldCreateUser: false // Login only, no signup (requires phone to be confirmed in Supabase)
+      }
     })
     return { data, error }
   }
